@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
+void main() => runApp(const MaterialApp(home: SettingsWidget()));
+
 class SettingsWidget extends StatelessWidget {
   const SettingsWidget({Key? key}) : super(key: key);
 
