@@ -8,12 +8,6 @@ class CheckinWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Check in", //TODO this will need to switch between Check In and Check Out
-        ),
-      ),
-    );
+    return Scaffold();
   }
 }

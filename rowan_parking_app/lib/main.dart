@@ -4,20 +4,10 @@ import 'content_widgets/settings_widget.dart';
 import 'content_widgets/checkin_widget.dart';
 import 'content_widgets/bug_report_widget.dart';
 
-void main() => runApp(const MainApp());
-
-class MainApp extends StatelessWidget {
-  const MainApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: PrimaryContent(),
-    );
-  }
-
-  void changePage() {}
-}
+void main() => runApp(MaterialApp(
+      home: const PrimaryContent(),
+      theme: ThemeData.dark(),
+    ));
 
 class PrimaryContent extends StatefulWidget {
   const PrimaryContent({Key? key}) : super(key: key);
@@ -28,45 +18,49 @@ class PrimaryContent extends StatefulWidget {
 
 class PrimaryContentState extends State<PrimaryContent> {
   Widget body = const LotsWidget();
+  Text contentTitle = const Text("Parking Lots");
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: contentTitle,
+      ),
       body: body,
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.local_parking,
-              color: Colors.grey,
+      drawer: Drawer(
+        elevation: 2,
+        child: ListView(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.local_parking_outlined),
+              title: const Text("Parking Lots"),
+              onTap: () {
+                setState(() {
+                  contentTitle = const Text("Parking Lots");
+                  body = const LotsWidget();
+                  Navigator.pop(context);
+                });
+              },
             ),
-            label: "Lots",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.settings,
-              color: Colors.grey,
-            ),
-            label: "Settings",
-          )
-        ],
-        onTap: (newIndex) {
-          switch (newIndex) {
-            case 0:
-              setState(() {
-                body = const LotsWidget();
-              });
-              break;
-            case 1:
-              setState(() {
-                body = const SettingsWidget();
-              });
-              break;
-          }
-        },
-        backgroundColor: Colors.red,
-        selectedItemColor: Colors.grey,
+            ListTile(
+              leading: const Icon(Icons.settings_outlined),
+              title: const Text("Settings"),
+              onTap: () {
+                setState(() {
+                  contentTitle = const Text("Settings");
+                  body =
+                      SettingsWidget(settingsChangedCallback: settingsChanged);
+                  Navigator.pop(context);
+                });
+              },
+            )
+          ],
+        ),
       ),
     );
+  }
+
+  void settingsChanged() {
+    print("settings have changed!");
   }
 }

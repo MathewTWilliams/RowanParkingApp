@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-void main() => runApp(const MaterialApp(home: SettingsWidget()));
-
 class SettingsWidget extends StatelessWidget {
-  const SettingsWidget({Key? key}) : super(key: key);
+  final VoidCallback settingsChangedCallback;
+
+  const SettingsWidget({Key? key, required this.settingsChangedCallback})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Settings"),
-      ),
-    );
+    return Scaffold();
   }
 }
