@@ -1,14 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-class SettingsWidget extends StatelessWidget {
-  final VoidCallback settingsChangedCallback;
+class SettingsWidget extends StatefulWidget {
+  ValueNotifier<ThemeData> appTheme;
 
-  const SettingsWidget({Key? key, required this.settingsChangedCallback})
-      : super(key: key);
+  SettingsWidget({Key? key, required this.appTheme}) : super(key: key) {}
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold();
-  }
+  State<StatefulWidget> createState() => SettingsWidgetState();
+}
+
+class SettingsWidgetState extends State<SettingsWidget> {
+  bool darkModeToggled = false;
+  SettingsWidgetState();
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        body: Center(
+          child: ListView(
+            children: [
+              Row(
+                children: [
+                  const Text("Dark Mode"),
+                  Switch(
+                    value: darkModeToggled,
+                    onChanged: (bool on) {
+                      setState(() {
+                        darkModeToggled = on;
+                        print(on);
+                        widget.appTheme.value =
+                            on ? ThemeData.dark() : ThemeData.light();
+                      });
+                    },
+                  )
+                ],
+              )
+            ],
+          ),
+        ),
+      );
 }

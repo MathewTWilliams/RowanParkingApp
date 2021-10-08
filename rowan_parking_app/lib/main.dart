@@ -4,19 +4,43 @@ import 'content_widgets/settings_widget.dart';
 import 'content_widgets/checkin_widget.dart';
 import 'content_widgets/bug_report_widget.dart';
 
-void main() => runApp(MaterialApp(
-      home: const PrimaryContent(),
-      theme: ThemeData.dark(),
-    ));
+void main() => runApp(const App());
 
-class PrimaryContent extends StatefulWidget {
-  const PrimaryContent({Key? key}) : super(key: key);
+class App extends StatefulWidget {
+  const App({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => PrimaryContentState();
+  State<StatefulWidget> createState() => AppState();
 }
 
-class PrimaryContentState extends State<PrimaryContent> {
+class AppState extends State<App> {
+  final ValueNotifier<ThemeData> appTheme =
+      ValueNotifier<ThemeData>(ThemeData.light());
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<ThemeData>(
+      valueListenable: appTheme,
+      builder: (context, themeData, child) {
+        return MaterialApp(theme: themeData, home: NavWidget(appTheme));
+      },
+    );
+  }
+
+  void toggleDarkMode(bool on) {
+    appTheme.value = on ? ThemeData.dark() : ThemeData.light();
+  }
+}
+
+class NavWidget extends StatefulWidget {
+  final ValueNotifier<ThemeData> appTheme;
+  NavWidget(this.appTheme, {Key? key}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => NavWidgetState();
+}
+
+class NavWidgetState extends State<NavWidget> {
   Widget body = const LotsWidget();
   Text contentTitle = const Text("Parking Lots");
 
@@ -38,7 +62,29 @@ class PrimaryContentState extends State<PrimaryContent> {
                 setState(() {
                   contentTitle = const Text("Parking Lots");
                   body = const LotsWidget();
-                  Navigator.pop(context);
+                  Navigator.of(context).pop();
+                });
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.check_circle_outline),
+              title: const Text("Check In"),
+              onTap: () {
+                setState(() {
+                  contentTitle = const Text("Check In");
+                  body = const CheckinWidget();
+                  Navigator.of(context).pop();
+                });
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.bug_report_outlined),
+              title: const Text("Report a Problem"),
+              onTap: () {
+                setState(() {
+                  contentTitle = const Text("Report a Problem");
+                  body = const BugReportWidget();
+                  Navigator.of(context).pop();
                 });
               },
             ),
@@ -48,9 +94,8 @@ class PrimaryContentState extends State<PrimaryContent> {
               onTap: () {
                 setState(() {
                   contentTitle = const Text("Settings");
-                  body =
-                      SettingsWidget(settingsChangedCallback: settingsChanged);
-                  Navigator.pop(context);
+                  body = SettingsWidget(appTheme: widget.appTheme);
+                  Navigator.of(context).pop();
                 });
               },
             )
@@ -58,9 +103,5 @@ class PrimaryContentState extends State<PrimaryContent> {
         ),
       ),
     );
-  }
-
-  void settingsChanged() {
-    print("settings have changed!");
   }
 }
