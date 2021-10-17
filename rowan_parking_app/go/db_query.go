@@ -7,6 +7,8 @@ import (
 	"database/sql"
 	"fmt"
 	"time"
+
+	geom "github.com/twpayne/go-geom"
 )
 
 //TODO: Figure out a way to use generic types in Go to limit the amount of boilerplate code
@@ -14,7 +16,7 @@ import (
 type Venue struct {
 	Id            int64
 	VenueName     string
-	VenueLocation []uint8 //geom.Point
+	VenueLocation *geom.Point
 }
 
 type Lot_Type struct {
@@ -31,8 +33,8 @@ type Lot struct {
 	NumSpaces      int64
 	VenueId        int64
 	SpecificRules  string
-	BoundingBox    []uint8 //geom.Polygon
-	LotLocation    []uint8 //geom.Point
+	BoundingBox    *geom.Polygon
+	LotLocation    *geom.Point
 }
 
 type Lot_Check_in struct {
