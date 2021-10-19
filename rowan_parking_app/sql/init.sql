@@ -1,3 +1,5 @@
+/* This script is used to intialize the database. */
+
 CREATE DATABASE IF NOT EXISTS RowanParkingApp;
 USE RowanParkingApp; 
 

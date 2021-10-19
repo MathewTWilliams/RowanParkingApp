@@ -1,16 +1,20 @@
+/* This script is used to fill the database with test data*/
+
 USE RowanParkingApp; 
 
 INSERT INTO Venues(Id, VenueName, VenueLocation)
-VALUES(1,"Rowan University", POINT(39.71,-75.11)); 
+VALUES(1,"Rowan University", ST_GeomFromText("POINT(39.71 -75.11)", 3857)); 
 
 INSERT INTO Lot_Types(Id, TypeName, Rules)
 VALUES(1, "Handicapped Parking", 
     "Requires a Permit or handicapped liscense plate.");
 
 INSERT INTO Lots(Id, LotName, LotDescription, LotType, NumSpaces,
-    VenueId, BoundingBox, LotLocation, SpecificRules)
+    VenueId, BoundingBox, 
+    LotLocation, SpecificRules)
 VALUES(1, "Lot A", "Generic Description of a Parking Lot", 1, 200, 
-    1, ST_GeomFromText('POLYGON((0 0,10 0,10 10,0 10,0 0))'), POINT(0,0), "");
+    1, ST_GeomFromText('POLYGON((0 0,10 0,10 10,0 10,0 0))', 3857), 
+    ST_GeomFromText("POINT(0 0)", 3857), "");
 
 INSERT INTO Lot_Check_ins(Id, LotId, CheckInTime, CheckOutTime,
     UserId)
