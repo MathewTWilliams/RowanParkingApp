@@ -18,7 +18,7 @@ func TestVenues(t *testing.T) {
 	var err error
 
 	database.InitDB()
-	venues, err = database.GetVenues(nil, nil)
+	venues, err = database.SelectVenues(nil, nil)
 
 	if err != nil {
 		t.Fatalf(err.Error())
@@ -36,7 +36,7 @@ func TestLotTypes(t *testing.T) {
 	var lot_types []models.Lot_Type
 	var err error
 	database.InitDB()
-	lot_types, err = database.GetLotTypes(nil, nil)
+	lot_types, err = database.SelectLotTypes(nil, nil)
 
 	if err != nil {
 		log.Fatal(err)
@@ -53,7 +53,7 @@ func TestLots(t *testing.T) {
 	var lots []models.Lot
 	var err error
 	database.InitDB()
-	lots, err = database.GetLots(nil, nil)
+	lots, err = database.SelectLots(nil, nil)
 
 	if err != nil {
 		t.Fatalf(err.Error())
@@ -71,7 +71,7 @@ func TestCheckIns(t *testing.T) {
 	var check_ins []models.Lot_Check_in
 	var err error
 	database.InitDB()
-	check_ins, err = database.GetLotCheckIns(nil, nil)
+	check_ins, err = database.SelectLotCheckIns(nil, nil)
 
 	if err != nil {
 		t.Fatalf(err.Error())
@@ -89,7 +89,7 @@ func TestUsers(t *testing.T) {
 	var users []models.User
 	var err error
 	database.InitDB()
-	users, err = database.GetUsers(nil, nil)
+	users, err = database.SelectUsers(nil, nil)
 
 	if err != nil {
 		t.Fatalf(err.Error())
@@ -106,7 +106,7 @@ func TestLotRatings(t *testing.T) {
 	var ratings []models.Lot_Rating
 	var err error
 	database.InitDB()
-	ratings, err = database.GetLotRatings(nil, nil)
+	ratings, err = database.SelectLotRatings(nil, nil)
 
 	if err != nil {
 		t.Fatalf(err.Error())
@@ -124,7 +124,7 @@ func TestBugs(t *testing.T) {
 	var bugs []models.Bug
 	var err error
 	database.InitDB()
-	bugs, err = database.GetBugs(nil, nil)
+	bugs, err = database.SelectBugs(nil, nil)
 
 	if err != nil {
 		t.Fatalf(err.Error())
