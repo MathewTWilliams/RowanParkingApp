@@ -31,7 +31,7 @@ func (ds *DataStore) PostCheckIn(c *gin.Context) {
 	err := c.BindJSON(&payload)
 	if err != nil {
 		log.Println("BindJSON Error: " + err.Error())
-		c.IndentedJSON(http.StatusInternalServerError, err)
+		c.IndentedJSON(http.StatusBadRequest, err)
 	} else {
 
 		lid, err := strconv.ParseInt(c.Param("lid"), 10, 64)
@@ -41,11 +41,15 @@ func (ds *DataStore) PostCheckIn(c *gin.Context) {
 
 		} else {
 
+			checkInTime := time.Now()
 			var newCheckIn models.Lot_Check_in
 			newCheckIn.LotId = lid
-			newCheckIn.CheckInTime = time.Now()
+			newCheckIn.CheckInTime = checkInTime
 			newCheckIn.UserId = payload.UserId
-			newCheckIn.CheckOutTime = time.Time{}
+			//subtract the check in time, by 1 second.
+			//Having a Checkout time that happened before your check in means
+			//you are currenlty check into a parking lot.
+			newCheckIn.CheckOutTime = checkInTime.Add(time.Second * -1)
 
 			err = ds.InsertCheckIn(newCheckIn)
 			if err != nil {
@@ -66,26 +70,28 @@ func (ds *DataStore) PostLotRating(c *gin.Context) {
 	err := c.BindJSON(&payload)
 
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, err)
-	}
-
-	lid, err := strconv.ParseInt(c.Param("lid"), 10, 64)
-	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err)
+	} else {
+		lid, err := strconv.ParseInt(c.Param("lid"), 10, 64)
+		if err != nil {
+			c.IndentedJSON(http.StatusBadRequest, err)
+		} else {
+
+			var newLotRating models.Lot_Rating
+			newLotRating.LotId = lid
+			newLotRating.Review = payload.Review
+			newLotRating.TimeOfReview = time.Now()
+			newLotRating.UserId = payload.UserId
+
+			err = ds.InsertLotRating(newLotRating)
+			if err != nil {
+				c.IndentedJSON(http.StatusInternalServerError, err)
+			} else {
+
+				c.IndentedJSON(http.StatusCreated, newLotRating)
+			}
+		}
 	}
-
-	var newLotRating models.Lot_Rating
-	newLotRating.LotId = lid
-	newLotRating.Review = payload.Review
-	newLotRating.TimeOfReview = time.Now()
-	newLotRating.UserId = payload.UserId
-
-	err = ds.InsertLotRating(newLotRating)
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, err)
-	}
-
-	c.IndentedJSON(http.StatusCreated, newLotRating)
 }
 
 func (ds *DataStore) PostBugReport(c *gin.Context) {
@@ -94,14 +100,19 @@ func (ds *DataStore) PostBugReport(c *gin.Context) {
 	err := c.BindJSON(&payload)
 
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, err)
+		c.IndentedJSON(http.StatusBadRequest, err)
+	} else {
+
+		var newBugReport models.Bug
+		newBugReport.BugReport = payload.BugReport
+		newBugReport.UserId = payload.UserId
+
+		err = ds.InsertBugReport(newBugReport)
+
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, err)
+		}
+
+		c.IndentedJSON(http.StatusCreated, newBugReport)
 	}
-
-	var newBugReport models.Bug
-	newBugReport.BugReport = payload.BugReport
-	newBugReport.UserId = payload.UserId
-
-	ds.InsertBugReport(newBugReport)
-
-	c.IndentedJSON(http.StatusCreated, newBugReport)
 }
