@@ -41,7 +41,7 @@ class NavWidget extends StatefulWidget {
 }
 
 class NavWidgetState extends State<NavWidget> {
-  Widget body = const LotsWidget();
+  Widget body = LotsWidget();
   Text contentTitle = const Text("Parking Lots");
 
   @override
@@ -61,7 +61,7 @@ class NavWidgetState extends State<NavWidget> {
               onTap: () {
                 setState(() {
                   contentTitle = const Text("Parking Lots");
-                  body = const LotsWidget();
+                  body = LotsWidget();
                   Navigator.of(context).pop();
                 });
               },
@@ -72,7 +72,7 @@ class NavWidgetState extends State<NavWidget> {
               onTap: () {
                 setState(() {
                   contentTitle = const Text("Check In");
-                  body = const CheckinWidget();
+                  body = CheckinWidget();
                   Navigator.of(context).pop();
                 });
               },
@@ -83,7 +83,7 @@ class NavWidgetState extends State<NavWidget> {
               onTap: () {
                 setState(() {
                   contentTitle = const Text("Report a Problem");
-                  body = const BugReportWidget();
+                  body = BugReportWidget();
                   Navigator.of(context).pop();
                 });
               },

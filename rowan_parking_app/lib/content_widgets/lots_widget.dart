@@ -16,7 +16,7 @@ class LotsWidget extends StatefulWidget {
 }
 
 class LotsWidgetState extends State<LotsWidget> {
-  late Future<Lots> futureLots;
+  late Future<Lots>? futureLots;
 
   @override
   void initState() {
@@ -41,9 +41,9 @@ class LotsWidgetState extends State<LotsWidget> {
 }
 
 class Lots {
-  final int userId;
-  final int id;
-  final String title;
+  final int? userId;
+  final int? id;
+  final String? title;
 
   Lots({
     required this.userId,

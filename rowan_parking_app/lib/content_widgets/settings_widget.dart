@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 class SettingsWidget extends StatefulWidget {
-  ValueNotifier<ThemeData> appTheme;
+  ValueNotifier<ThemeData>? appTheme;
 
   SettingsWidget({Key? key, required this.appTheme}) : super(key: key) {}
 
@@ -28,7 +28,7 @@ class SettingsWidgetState extends State<SettingsWidget> {
                       setState(() {
                         darkModeToggled = on;
                         print(on);
-                        widget.appTheme.value =
+                        widget.appTheme!.value =
                             on ? ThemeData.dark() : ThemeData.light();
                       });
                     },
