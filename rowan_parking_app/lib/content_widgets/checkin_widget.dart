@@ -1,109 +1,119 @@
 import 'package:flutter/material.dart';
-import 'content_widgets/lots_widget.dart';
-import 'content_widgets/settings_widget.dart';
-import 'content_widgets/checkin_widget.dart';
-import 'content_widgets/bug_report_widget.dart';
+import 'package:flutter/cupertino.dart';
 
 
-void main() => runApp(const App());
+void main() => runApp(const MaterialApp(home: CheckinWidget()));
 
-
-class App extends StatefulWidget {
-  const App({Key? key}) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => AppState();
-}
-
-class AppState extends State<App> {
-  final ValueNotifier<ThemeData> appTheme =
-      ValueNotifier<ThemeData>(ThemeData.light());
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<ThemeData>(
-      valueListenable: appTheme,
-      builder: (context, themeData, child) {
-        return MaterialApp(theme: themeData, home: NavWidget(appTheme));
-      },
-    );
-  }
-
-  void toggleDarkMode(bool on) {
-    appTheme.value = on ? ThemeData.dark() : ThemeData.light();
-  }
-}
-
-class NavWidget extends StatefulWidget {
-  final ValueNotifier<ThemeData> appTheme;
-  NavWidget(this.appTheme, {Key? key}) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => NavWidgetState();
-}
-
-class NavWidgetState extends State<NavWidget> {
-  Widget body = const LotsWidget();
-  Text contentTitle = const Text("Parking Lots");
+class CheckinWidget extends StatelessWidget {
+  const CheckinWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: contentTitle,
-      ),
-      body: body,
-      drawer: Drawer(
-        elevation: 2,
-        child: ListView(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.local_parking_outlined),
-              title: const Text("Parking Lots"),
-              onTap: () {
-                setState(() {
-                  contentTitle = const Text("Parking Lots");
-                  body = const LotsWidget();
-                  Navigator.of(context).pop();
-                });
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.check_circle_outline),
-              title: const Text("Check In"),
-              onTap: () {
-                setState(() {
-                  contentTitle = const Text("Check In");
-                  body = const CheckinWidget();
-                  Navigator.of(context).pop();
-                });
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.bug_report_outlined),
-              title: const Text("Report a Problem"),
-              onTap: () {
-                setState(() {
-                  contentTitle = const Text("Report a Problem");
-                  body = const BugReportWidget();
-                  Navigator.of(context).pop();
-                });
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings_outlined),
-              title: const Text("Settings"),
-              onTap: () {
-                setState(() {
-                  contentTitle = const Text("Settings");
-                  body = SettingsWidget(appTheme: widget.appTheme);
-                  Navigator.of(context).pop();
-                });
-              },
-            )
-          ],
+        appBar: AppBar(
+            title: const Text("Lot Information")
         ),
-      ),
+      body: ListView(
+        shrinkWrap: true, padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
+        children: <Widget> [
+          LotInfoBox(
+              rating: 'Good Availability',
+              lotName: 'Lot O',
+              permission: 'Commuter'),
+          ElevatedButton( child: const Text('Check-in'),
+            onPressed: (){ //Navigates to the Checkout screen
+              Navigator.push(context,
+                MaterialPageRoute(builder: (context)=> const CheckoutWidget()),
+              );
+            },
+          ),
+        ],
+      )
     );
   }
 }
+
+/* Basic CheckinBox used above
+CheckinBox(
+  rating: 'No Availability',
+  lotName: 'Lot A-1',
+  permission: 'Employee'),
+ */
+
+// Holds the information for what goes into the LotInfoBox for the above listView
+class LotInfoBox extends StatelessWidget {
+  LotInfoBox({required this.rating, required this.lotName, required this.permission});
+  final String rating;
+  final String lotName;
+  final String permission;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(8), height: 120,
+        child: Card(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Text(rating, style: const TextStyle(fontWeight:
+                FontWeight.bold)), Text(lotName), Text(permission),
+            ],
+          ),
+
+        ),
+
+    );
+  }
+}
+
+/*
+**********************************
+  HERE STARTS THEW CHECKOUT PAGE
+**********************************
+*/
+class CheckoutWidget extends StatelessWidget{
+  const CheckoutWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context){
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Ready to Check-Out?")
+      ),
+        body: ListView(
+          shrinkWrap: true, padding: const EdgeInsets.fromLTRB(10.0, 50.0, 10.0, 20.0),
+          children: <Widget> [
+            CheckoutBox(rating: 'Test Rating', lotName: 'Test Name'),
+            ElevatedButton( child: const Text('Check-out of this lot'),
+              onPressed: (){
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        )
+    );
+  }
+}
+
+//This holds the information for what goes into the checkout box listed above
+class CheckoutBox extends StatelessWidget {
+  CheckoutBox({required this.rating, required this.lotName});
+  final String rating;
+  final String lotName;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        padding: const EdgeInsets.all(2), height: 120, child: Card(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
+          Text(rating, style: const TextStyle(fontWeight:
+          FontWeight.bold)), Text(lotName),
+          ],
+        )
+        )
+    );
+  }
+}
+
+
