@@ -1,59 +1,109 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+import 'content_widgets/lots_widget.dart';
+import 'content_widgets/settings_widget.dart';
+import 'content_widgets/checkin_widget.dart';
+import 'content_widgets/bug_report_widget.dart';
 
-void main() => runApp(const MaterialApp(home: CheckinWidget()));
 
-class CheckinWidget extends StatelessWidget {
-  const CheckinWidget({Key? key}) : super(key: key);
+void main() => runApp(const App());
+
+
+class App extends StatefulWidget {
+  const App({Key? key}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => AppState();
+}
+
+class AppState extends State<App> {
+  final ValueNotifier<ThemeData> appTheme =
+      ValueNotifier<ThemeData>(ThemeData.light());
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<ThemeData>(
+      valueListenable: appTheme,
+      builder: (context, themeData, child) {
+        return MaterialApp(theme: themeData, home: NavWidget(appTheme));
+      },
+    );
+  }
+
+  void toggleDarkMode(bool on) {
+    appTheme.value = on ? ThemeData.dark() : ThemeData.light();
+  }
+}
+
+class NavWidget extends StatefulWidget {
+  final ValueNotifier<ThemeData> appTheme;
+  NavWidget(this.appTheme, {Key? key}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => NavWidgetState();
+}
+
+class NavWidgetState extends State<NavWidget> {
+  Widget body = const LotsWidget();
+  Text contentTitle = const Text("Parking Lots");
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: ListView(
-      shrinkWrap: true,
-      padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
-      children: <Widget>[
-        CheckinBox(
-            rating: 'Good Availability',
-            lotName: 'Lot O',
-            permission: 'Commuter parking'),
-        CheckinBox(
-            rating: 'Alright Availability',
-            lotName: 'Lot P',
-            permission: 'Commuter parking'),
-        CheckinBox(
-            rating: 'Poor Availability',
-            lotName: 'Lot W',
-            permission: 'Residential parking'),
-        CheckinBox(
-            rating: 'No Availability',
-            lotName: 'Lot A-1',
-            permission: 'Employee parking'),
-      ],
-    ));
-  }
-}
-
-// Holds the information for what goes into the CheckinBox for the above listView
-class CheckinBox extends StatelessWidget {
-  CheckinBox(
-      {required this.rating, required this.lotName, required this.permission});
-  final String? rating;
-  final String? lotName;
-  final String? permission;
-
-  Widget build(BuildContext context) {
-    return Container(
-        padding: EdgeInsets.all(2),
-        height: 120,
-        child: Card(
-            child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Text(this.rating!, style: TextStyle(fontWeight: FontWeight.bold)),
-            Text(this.lotName!),
-            Text(this.permission!)
+      appBar: AppBar(
+        title: contentTitle,
+      ),
+      body: body,
+      drawer: Drawer(
+        elevation: 2,
+        child: ListView(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.local_parking_outlined),
+              title: const Text("Parking Lots"),
+              onTap: () {
+                setState(() {
+                  contentTitle = const Text("Parking Lots");
+                  body = const LotsWidget();
+                  Navigator.of(context).pop();
+                });
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.check_circle_outline),
+              title: const Text("Check In"),
+              onTap: () {
+                setState(() {
+                  contentTitle = const Text("Check In");
+                  body = const CheckinWidget();
+                  Navigator.of(context).pop();
+                });
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.bug_report_outlined),
+              title: const Text("Report a Problem"),
+              onTap: () {
+                setState(() {
+                  contentTitle = const Text("Report a Problem");
+                  body = const BugReportWidget();
+                  Navigator.of(context).pop();
+                });
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings_outlined),
+              title: const Text("Settings"),
+              onTap: () {
+                setState(() {
+                  contentTitle = const Text("Settings");
+                  body = SettingsWidget(appTheme: widget.appTheme);
+                  Navigator.of(context).pop();
+                });
+              },
+            )
           ],
-        )));
+        ),
+      ),
+    );
   }
 }
