@@ -65,7 +65,7 @@ func (ds *DataStore) SelectVenues(columns []string, conditions []string) ([]mode
 		}
 
 		//need to ignore the first 4 bytes added by MySQL
-		vl, err := wkb.Unmarshal(temp[4:])
+		vl, err := wkb.Unmarshal(temp[SRID_BYTE_OFFSET:])
 		if err != nil {
 			return nil, fmt.Errorf("GetVenues: %v", err)
 		}
@@ -144,12 +144,12 @@ func (ds *DataStore) SelectLots(columns []string, conditions []string) ([]models
 		}
 
 		//need to ignore the first 4 bytes added by MySQL
-		bb, err := wkb.Unmarshal(tempBB[4:])
+		bb, err := wkb.Unmarshal(tempBB[SRID_BYTE_OFFSET:])
 		if err != nil {
 			return nil, fmt.Errorf(("GetVenues: %v"), err)
 		}
 
-		ll, err := wkb.Unmarshal(tempLL[4:])
+		ll, err := wkb.Unmarshal(tempLL[SRID_BYTE_OFFSET:])
 		if err != nil {
 			return nil, fmt.Errorf("GetLots: %v", err)
 		}
