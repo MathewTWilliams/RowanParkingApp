@@ -24,6 +24,12 @@ type BugReportPayload struct {
 	BugReport string `json:"BugReport"`
 }
 
+type CheckInResponse struct {
+	models.Lot_Check_in
+	SpotsTaken int64 `json:"SpotsTaken"`
+}
+
+//after submitting db query to post, need to inner join user id on 2 tables to get venue id
 func (ds *DataStore) PostCheckIn(c *gin.Context) {
 
 	var payload CheckInPayload

@@ -5,8 +5,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,7 +29,6 @@ func main() {
 	SetGetEndPoints(router, &database)
 	SetPostEndPoints(router, &database)
 
-	log.SetFlags(log.LstdFlags)
 	router.Run("localhost:80")
 
 }

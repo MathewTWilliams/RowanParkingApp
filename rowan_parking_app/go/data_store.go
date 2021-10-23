@@ -15,7 +15,7 @@ import (
 )
 
 type DataStore struct {
-	db *sql.DB
+	*sql.DB
 }
 
 func (ds *DataStore) InitDB() {
@@ -30,16 +30,21 @@ func (ds *DataStore) InitDB() {
 	}
 
 	var err error
-	ds.db, err = sql.Open("mysql", cfg.FormatDSN())
+	ds.DB, err = sql.Open("mysql", cfg.FormatDSN())
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	pingErr := ds.db.Ping()
+	pingErr := ds.DB.Ping()
 	if pingErr != nil {
 		log.Fatal(pingErr)
 	}
 
 	fmt.Println("Connected!")
 }
+
+//func (ds *DataStore) CheckIfExists(tablename string, cols []string, conditions []string) (bool, error) {
+//	var builder string.Builder
+
+//}

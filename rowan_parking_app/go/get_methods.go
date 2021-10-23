@@ -13,16 +13,16 @@ import (
 //make our methods part of the DataStore struct so we can access db without
 // the need for global variables
 func (ds *DataStore) GetVenues(c *gin.Context) {
-	var venues []models.Venue
 	var err error
+	var venues []models.Venue
 	venues, err = ds.SelectVenues(nil, nil)
-
 	if err != nil {
+
 		c.IndentedJSON(http.StatusInternalServerError, err)
 	} else if venues == nil {
+
 		c.IndentedJSON(http.StatusNoContent, []models.Venue{})
 	}
-
 	c.IndentedJSON(http.StatusOK, venues)
 
 }
@@ -46,6 +46,7 @@ func (ds *DataStore) GetVenueById(c *gin.Context) {
 
 }
 
+//need to add it to return the number of spots taken.
 func (ds *DataStore) GetLotsFromVenue(c *gin.Context) {
 	var lots []models.Lot
 	var err error

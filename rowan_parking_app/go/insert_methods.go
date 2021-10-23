@@ -37,7 +37,7 @@ func (ds *DataStore) InsertCheckIn(checkIn models.Lot_Check_in) error {
 	cols := []string{"Id", "LotId", "CheckInTime", "CheckOutTime", "UserId"}
 
 	query := ds.InsertQueryBuilder(TABLENAME_LCI, cols)
-	result, err := ds.db.Exec(query, checkIn.Id, checkIn.LotId,
+	result, err := ds.Exec(query, checkIn.Id, checkIn.LotId,
 		checkIn.CheckInTime, checkIn.CheckOutTime, checkIn.UserId)
 
 	if err != nil {
@@ -57,7 +57,7 @@ func (ds *DataStore) InsertLotRating(rating models.Lot_Rating) error {
 	cols := []string{"Id", "UserId", "LotId", "TimeOfReview", "Review"}
 
 	query := ds.InsertQueryBuilder(TABLENAME_LR, cols)
-	result, err := ds.db.Exec(query, rating.Id, rating.UserId,
+	result, err := ds.Exec(query, rating.Id, rating.UserId,
 		rating.LotId, rating.TimeOfReview, rating.Review)
 
 	if err != nil {
@@ -77,7 +77,7 @@ func (ds *DataStore) InsertBugReport(bug models.Bug) error {
 	cols := []string{"Id", "BugReport", "UserId"}
 
 	query := ds.InsertQueryBuilder(TABLENAME_BUGS, cols)
-	result, err := ds.db.Exec(query, bug.Id, bug.BugReport, bug.UserId)
+	result, err := ds.Exec(query, bug.Id, bug.BugReport, bug.UserId)
 
 	if err != nil {
 		return fmt.Errorf("InsertBugReport: %v", err)
