@@ -18,11 +18,12 @@ func (api *API) GetVenues(c *gin.Context) {
 	venues, err = api.ds.SelectVenues(nil, nil)
 
 	if err != nil {
+
 		c.IndentedJSON(http.StatusInternalServerError, err)
 	} else if venues == nil {
+
 		c.IndentedJSON(http.StatusNoContent, []models.Venue{})
 	}
-
 	c.IndentedJSON(http.StatusOK, venues)
 
 }

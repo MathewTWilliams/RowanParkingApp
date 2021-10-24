@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
+bool darkModeToggled = false;
+
 class SettingsWidget extends StatefulWidget {
   ValueNotifier<ThemeData>? appTheme;
 
@@ -11,7 +13,7 @@ class SettingsWidget extends StatefulWidget {
 }
 
 class SettingsWidgetState extends State<SettingsWidget> {
-  bool darkModeToggled = false;
+
   SettingsWidgetState();
 
   @override
