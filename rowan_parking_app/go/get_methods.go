@@ -12,10 +12,10 @@ import (
 
 //make our methods part of the DataStore struct so we can access db without
 // the need for global variables
-func (ds *DataStore) GetVenues(c *gin.Context) {
+func (api *API) GetVenues(c *gin.Context) {
 	var venues []models.Venue
 	var err error
-	venues, err = ds.SelectVenues(nil, nil)
+	venues, err = api.ds.SelectVenues(nil, nil)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
@@ -27,14 +27,14 @@ func (ds *DataStore) GetVenues(c *gin.Context) {
 
 }
 
-func (ds *DataStore) GetVenueById(c *gin.Context) {
+func (api *API) GetVenueById(c *gin.Context) {
 	var queryResult []models.Venue
 	var err error
 
 	vid := c.Param("vid")
 	var conditions []string
 	conditions = append(conditions, "Where Id = "+vid)
-	queryResult, err = ds.SelectVenues(nil, conditions)
+	queryResult, err = api.ds.SelectVenues(nil, conditions)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
@@ -46,7 +46,7 @@ func (ds *DataStore) GetVenueById(c *gin.Context) {
 
 }
 
-func (ds *DataStore) GetLotsFromVenue(c *gin.Context) {
+func (api *API) GetLotsFromVenue(c *gin.Context) {
 	var lots []models.Lot
 	var err error
 
@@ -55,7 +55,7 @@ func (ds *DataStore) GetLotsFromVenue(c *gin.Context) {
 	var conditions []string
 	conditions = append(conditions, "Where VenueId = "+vid)
 
-	lots, err = ds.SelectLots(nil, conditions)
+	lots, err = api.ds.SelectLots(nil, conditions)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 	} else if lots == nil || len(lots) == 0 {
@@ -65,7 +65,7 @@ func (ds *DataStore) GetLotsFromVenue(c *gin.Context) {
 	}
 }
 
-func (ds *DataStore) GetLotFromVenue(c *gin.Context) {
+func (api *API) GetLotFromVenue(c *gin.Context) {
 	var queryResult []models.Lot
 	var err error
 
@@ -77,7 +77,7 @@ func (ds *DataStore) GetLotFromVenue(c *gin.Context) {
 	conditions = append(conditions, "Where VenueID = "+vid)
 	conditions = append(conditions, " AND LotId = "+lid)
 
-	queryResult, err = ds.SelectLots(nil, conditions)
+	queryResult, err = api.ds.SelectLots(nil, conditions)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 	} else if queryResult == nil || len(queryResult) == 0 || len(queryResult) > 1 {

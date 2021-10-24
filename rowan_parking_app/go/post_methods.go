@@ -24,7 +24,7 @@ type BugReportPayload struct {
 	BugReport string `json:"BugReport"`
 }
 
-func (ds *DataStore) PostCheckIn(c *gin.Context) {
+func (api *API) PostCheckIn(c *gin.Context) {
 
 	var payload CheckInPayload
 
@@ -51,7 +51,7 @@ func (ds *DataStore) PostCheckIn(c *gin.Context) {
 			//you are currenlty check into a parking lot.
 			newCheckIn.CheckOutTime = checkInTime.Add(time.Second * -1)
 
-			err = ds.InsertCheckIn(newCheckIn)
+			err = api.ds.InsertCheckIn(newCheckIn)
 			if err != nil {
 				log.Println("Insert Check In Error " + err.Error())
 				c.IndentedJSON(http.StatusInternalServerError, err)
@@ -64,7 +64,7 @@ func (ds *DataStore) PostCheckIn(c *gin.Context) {
 	}
 }
 
-func (ds *DataStore) PostLotRating(c *gin.Context) {
+func (api *API) PostLotRating(c *gin.Context) {
 	var payload LotRatingPayload
 
 	err := c.BindJSON(&payload)
@@ -83,7 +83,7 @@ func (ds *DataStore) PostLotRating(c *gin.Context) {
 			newLotRating.TimeOfReview = time.Now()
 			newLotRating.UserId = payload.UserId
 
-			err = ds.InsertLotRating(newLotRating)
+			err = api.ds.InsertLotRating(newLotRating)
 			if err != nil {
 				c.IndentedJSON(http.StatusInternalServerError, err)
 			} else {
@@ -94,7 +94,7 @@ func (ds *DataStore) PostLotRating(c *gin.Context) {
 	}
 }
 
-func (ds *DataStore) PostBugReport(c *gin.Context) {
+func (api *API) PostBugReport(c *gin.Context) {
 	var payload BugReportPayload
 
 	err := c.BindJSON(&payload)
@@ -107,7 +107,7 @@ func (ds *DataStore) PostBugReport(c *gin.Context) {
 		newBugReport.BugReport = payload.BugReport
 		newBugReport.UserId = payload.UserId
 
-		err = ds.InsertBugReport(newBugReport)
+		err = api.ds.InsertBugReport(newBugReport)
 
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, err)
