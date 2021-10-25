@@ -4,11 +4,16 @@
 
 package main
 
+import (
+	api "RPA/backend/api"
+	db "RPA/backend/database"
+)
+
 func main() {
-	var database DataStore
+	var database db.DataStore
 	database.InitDB()
 
-	var api API
+	var api api.API
 	api.InitAPI(&database)
 	api.StartListening()
 }

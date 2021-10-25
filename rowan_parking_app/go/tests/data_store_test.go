@@ -3,9 +3,10 @@
 //A script to test the functionality
 //for our DataStore struct.
 
-package main
+package tests
 
 import (
+	db "RPA/backend/database"
 	"RPA/backend/models"
 	"fmt"
 	"log"
@@ -13,7 +14,7 @@ import (
 )
 
 func TestVenues(t *testing.T) {
-	var database DataStore
+	var database db.DataStore
 	var venues []models.Venue
 	var err error
 
@@ -32,7 +33,7 @@ func TestVenues(t *testing.T) {
 }
 
 func TestLotTypes(t *testing.T) {
-	var database DataStore
+	var database db.DataStore
 	var lot_types []models.Lot_Type
 	var err error
 	database.InitDB()
@@ -49,7 +50,7 @@ func TestLotTypes(t *testing.T) {
 }
 
 func TestLots(t *testing.T) {
-	var database DataStore
+	var database db.DataStore
 	var lots []models.Lot
 	var err error
 	database.InitDB()
@@ -67,7 +68,7 @@ func TestLots(t *testing.T) {
 }
 
 func TestCheckIns(t *testing.T) {
-	var database DataStore
+	var database db.DataStore
 	var check_ins []models.Lot_Check_in
 	var err error
 	database.InitDB()
@@ -85,7 +86,7 @@ func TestCheckIns(t *testing.T) {
 }
 
 func TestUsers(t *testing.T) {
-	var database DataStore
+	var database db.DataStore
 	var users []models.User
 	var err error
 	database.InitDB()
@@ -102,7 +103,7 @@ func TestUsers(t *testing.T) {
 }
 
 func TestLotRatings(t *testing.T) {
-	var database DataStore
+	var database db.DataStore
 	var ratings []models.Lot_Rating
 	var err error
 	database.InitDB()
@@ -120,7 +121,7 @@ func TestLotRatings(t *testing.T) {
 }
 
 func TestBugs(t *testing.T) {
-	var database DataStore
+	var database db.DataStore
 	var bugs []models.Bug
 	var err error
 	database.InitDB()

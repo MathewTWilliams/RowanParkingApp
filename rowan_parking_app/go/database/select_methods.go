@@ -1,4 +1,4 @@
-package main
+package database
 
 import (
 	"RPA/backend/models"
@@ -32,7 +32,7 @@ func (ds *DataStore) SelectQueryBuilder(table string,
 
 	query.WriteString("from " + table + " ")
 
-	if conditions != nil || len(conditions) > 0 {
+	if conditions != nil && len(conditions) > 0 {
 		for _, cond := range conditions {
 			query.WriteString(cond + " ")
 		}

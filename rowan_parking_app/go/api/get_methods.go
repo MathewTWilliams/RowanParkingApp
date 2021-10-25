@@ -1,7 +1,7 @@
 //Author: Matt Williams
 //Version: 10/19/2021
 
-package main
+package api
 
 import (
 	"RPA/backend/models"
@@ -39,7 +39,7 @@ func (api *API) GetVenueById(c *gin.Context) {
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
-	} else if queryResult == nil || len(queryResult) == 0 || len(queryResult) > 1 {
+	} else if len(queryResult) == 0 || len(queryResult) > 1 {
 		c.IndentedJSON(http.StatusNoContent, []models.Venue{})
 	} else {
 		c.IndentedJSON(http.StatusOK, queryResult[0])
@@ -47,6 +47,7 @@ func (api *API) GetVenueById(c *gin.Context) {
 
 }
 
+//Need to return the number of spots taken for each lot
 func (api *API) GetLotsFromVenue(c *gin.Context) {
 	var lots []models.Lot
 	var err error
@@ -59,13 +60,14 @@ func (api *API) GetLotsFromVenue(c *gin.Context) {
 	lots, err = api.ds.SelectLots(nil, conditions)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
-	} else if lots == nil || len(lots) == 0 {
+	} else if len(lots) == 0 {
 		c.IndentedJSON(http.StatusNoContent, []models.Lot{})
 	} else {
 		c.IndentedJSON(http.StatusOK, lots)
 	}
 }
 
+//Needs to return number of spots taken in lot
 func (api *API) GetLotFromVenue(c *gin.Context) {
 	var queryResult []models.Lot
 	var err error
@@ -81,7 +83,7 @@ func (api *API) GetLotFromVenue(c *gin.Context) {
 	queryResult, err = api.ds.SelectLots(nil, conditions)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
-	} else if queryResult == nil || len(queryResult) == 0 || len(queryResult) > 1 {
+	} else if len(queryResult) == 0 || len(queryResult) > 1 {
 		c.IndentedJSON(http.StatusNoContent, models.Lot{})
 	} else {
 		c.IndentedJSON(http.StatusOK, queryResult[0])
