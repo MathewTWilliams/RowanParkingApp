@@ -1,6 +1,6 @@
 //Author: Matt Williams
 //Version: 10/7/2021
-package database
+package constants
 
 // Table Names
 const TABLENAME_VENUES = "Venues"
