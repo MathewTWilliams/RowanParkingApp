@@ -22,3 +22,13 @@ type RegisterUserPayload struct {
 type RegisterUserResponse struct {
 	UserId int64 `json:"UserId"`
 }
+
+type GetLotResponse struct {
+	SpotsTaken int64 `json:"SpotsTaken"`
+	LotInfo    Lot   `json:"LotInfo"`
+}
+
+type PostCheckInResponse struct {
+	SpotsTaken  int64        `json:"SpotsTaken"`
+	CheckInInfo Lot_Check_in `json:"CheckInInfo"`
+}
