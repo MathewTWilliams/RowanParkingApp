@@ -5,33 +5,15 @@
 package main
 
 import (
-	"log"
-
-	"github.com/gin-gonic/gin"
+	api "RPA/backend/api"
+	db "RPA/backend/database"
 )
 
-func SetGetEndPoints(router *gin.Engine, db *DataStore) {
-	router.GET("/api/venues", db.GetVenues)
-	router.GET("/api/venues/:vid", db.GetVenueById)
-	router.GET("/api/venues/:vid/lots", db.GetLotsFromVenue)
-	router.GET("/api/venues/:vid/lots/:lid", db.GetLotFromVenue)
-}
-
-func SetPostEndPoints(router *gin.Engine, db *DataStore) {
-	router.POST("/api/venues/:vid/lots/:lid/check_in", db.PostCheckIn)
-	router.POST("/api/venues/:vid/lots/:lid/rating", db.PostLotRating)
-	router.POST("/api/users/report_bug", db.PostBugReport)
-}
-
 func main() {
-	var database DataStore
+	var database db.DataStore
 	database.InitDB()
 
-	router := gin.Default()
-	SetGetEndPoints(router, &database)
-	SetPostEndPoints(router, &database)
-
-	log.SetFlags(log.LstdFlags)
-	router.Run("localhost:80")
-
+	var api api.API
+	api.InitAPI(&database)
+	api.StartListening()
 }

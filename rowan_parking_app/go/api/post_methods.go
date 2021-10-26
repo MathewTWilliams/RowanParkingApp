@@ -1,6 +1,7 @@
-package main
+package api
 
 import (
+	db "RPA/backend/database"
 	"RPA/backend/models"
 	"log"
 	"net/http"
@@ -10,33 +11,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type CheckInPayload struct {
-	UserId int64 `json:"UserId"`
-}
+func (api *API) PostCheckIn(c *gin.Context) {
 
-type LotRatingPayload struct {
-	UserId int64 `json:"UserId"`
-	Review int64 `json:"Review"`
-}
-
-type BugReportPayload struct {
-	UserId    int64  `json:"UserId"`
-	BugReport string `json:"BugReport"`
-}
-
-func (ds *DataStore) PostCheckIn(c *gin.Context) {
-
-	var payload CheckInPayload
+	var payload models.CheckInPayload
 
 	err := c.BindJSON(&payload)
 	if err != nil {
-		log.Println("BindJSON Error: " + err.Error())
 		c.IndentedJSON(http.StatusBadRequest, err)
 	} else {
 
 		lid, err := strconv.ParseInt(c.Param("lid"), 10, 64)
 		if err != nil {
-			log.Println("Parse Int error")
 			c.IndentedJSON(http.StatusBadRequest, err)
 
 		} else {
@@ -51,21 +36,20 @@ func (ds *DataStore) PostCheckIn(c *gin.Context) {
 			//you are currenlty check into a parking lot.
 			newCheckIn.CheckOutTime = checkInTime.Add(time.Second * -1)
 
-			err = ds.InsertCheckIn(newCheckIn)
+			checkin_id, err := api.ds.InsertCheckIn(newCheckIn)
 			if err != nil {
-				log.Println("Insert Check In Error " + err.Error())
 				c.IndentedJSON(http.StatusInternalServerError, err)
 
 			} else {
-
+				newCheckIn.Id = checkin_id
 				c.IndentedJSON(http.StatusCreated, newCheckIn)
 			}
 		}
 	}
 }
 
-func (ds *DataStore) PostLotRating(c *gin.Context) {
-	var payload LotRatingPayload
+func (api *API) PostLotRating(c *gin.Context) {
+	var payload models.LotRatingPayload
 
 	err := c.BindJSON(&payload)
 
@@ -83,19 +67,19 @@ func (ds *DataStore) PostLotRating(c *gin.Context) {
 			newLotRating.TimeOfReview = time.Now()
 			newLotRating.UserId = payload.UserId
 
-			err = ds.InsertLotRating(newLotRating)
+			lr_id, err := api.ds.InsertLotRating(newLotRating)
 			if err != nil {
 				c.IndentedJSON(http.StatusInternalServerError, err)
 			} else {
-
+				newLotRating.Id = lr_id
 				c.IndentedJSON(http.StatusCreated, newLotRating)
 			}
 		}
 	}
 }
 
-func (ds *DataStore) PostBugReport(c *gin.Context) {
-	var payload BugReportPayload
+func (api *API) PostBugReport(c *gin.Context) {
+	var payload models.BugReportPayload
 
 	err := c.BindJSON(&payload)
 
@@ -107,12 +91,51 @@ func (ds *DataStore) PostBugReport(c *gin.Context) {
 		newBugReport.BugReport = payload.BugReport
 		newBugReport.UserId = payload.UserId
 
-		err = ds.InsertBugReport(newBugReport)
+		b_id, err := api.ds.InsertBugReport(newBugReport)
 
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, err)
 		}
 
+		newBugReport.Id = b_id
 		c.IndentedJSON(http.StatusCreated, newBugReport)
 	}
+}
+
+func (api *API) TryPostUser(c *gin.Context) {
+	var err error
+	var payload models.RegisterUserPayload
+
+	err = c.BindJSON(&payload)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	var conditions []string
+	conditions = append(conditions, "Where VenueID = "+strconv.Itoa(int(payload.VenueId)))
+	conditions = append(conditions, "AND UserName = \""+payload.UserName+"\"")
+	uid, err := api.ds.CheckIfExists(db.TABLENAME_USERS, conditions)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
+	} else if uid < 0 {
+		var user models.User
+		user.Settings = models.SettingsJson{TextSize: 14, Language: "English"}
+		user.UserName = payload.UserName
+		user.VenueId = payload.VenueId
+		uid, err = api.ds.InsertUser(user)
+		if err != nil {
+			log.Println(err.Error())
+			c.IndentedJSON(http.StatusInternalServerError, err)
+			return
+		}
+		user.Id = uid
+		c.IndentedJSON(http.StatusCreated, user)
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, models.RegisterUserResponse{UserId: uid})
+
 }

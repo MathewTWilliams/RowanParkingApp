@@ -1,4 +1,4 @@
-package main
+package database
 
 import (
 	"RPA/backend/models"
@@ -32,7 +32,7 @@ func (ds *DataStore) SelectQueryBuilder(table string,
 
 	query.WriteString("from " + table + " ")
 
-	if conditions != nil || len(conditions) > 0 {
+	if conditions != nil && len(conditions) > 0 {
 		for _, cond := range conditions {
 			query.WriteString(cond + " ")
 		}
@@ -40,7 +40,6 @@ func (ds *DataStore) SelectQueryBuilder(table string,
 
 	query.WriteString(";")
 	return query.String()
-
 }
 
 func (ds *DataStore) SelectVenues(columns []string, conditions []string) ([]models.Venue, error) {
@@ -48,7 +47,7 @@ func (ds *DataStore) SelectVenues(columns []string, conditions []string) ([]mode
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.db.Query(ds.SelectQueryBuilder(TABLENAME_VENUES, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(TABLENAME_VENUES, columns, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("Get Venues: %v", err)
@@ -65,7 +64,7 @@ func (ds *DataStore) SelectVenues(columns []string, conditions []string) ([]mode
 		}
 
 		//need to ignore the first 4 bytes added by MySQL
-		vl, err := wkb.Unmarshal(temp[4:])
+		vl, err := wkb.Unmarshal(temp[SRID_BYTE_OFFSET:])
 		if err != nil {
 			return nil, fmt.Errorf("GetVenues: %v", err)
 		}
@@ -91,7 +90,7 @@ func (ds *DataStore) SelectLotTypes(columns []string, conditions []string) ([]mo
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.db.Query(ds.SelectQueryBuilder(TABLENAME_LT, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(TABLENAME_LT, columns, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("GetLotTypes: %v", err)
@@ -124,7 +123,7 @@ func (ds *DataStore) SelectLots(columns []string, conditions []string) ([]models
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.db.Query(ds.SelectQueryBuilder(TABLENAME_LOTS, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(TABLENAME_LOTS, columns, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("GetLots: %v", err)
@@ -144,12 +143,12 @@ func (ds *DataStore) SelectLots(columns []string, conditions []string) ([]models
 		}
 
 		//need to ignore the first 4 bytes added by MySQL
-		bb, err := wkb.Unmarshal(tempBB[4:])
+		bb, err := wkb.Unmarshal(tempBB[SRID_BYTE_OFFSET:])
 		if err != nil {
 			return nil, fmt.Errorf(("GetVenues: %v"), err)
 		}
 
-		ll, err := wkb.Unmarshal(tempLL[4:])
+		ll, err := wkb.Unmarshal(tempLL[SRID_BYTE_OFFSET:])
 		if err != nil {
 			return nil, fmt.Errorf("GetLots: %v", err)
 		}
@@ -179,7 +178,7 @@ func (ds *DataStore) SelectLotCheckIns(columns []string, conditions []string) ([
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.db.Query(ds.SelectQueryBuilder(TABLENAME_LCI, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(TABLENAME_LCI, columns, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("GetLotCheckIns: %v", err)
@@ -213,7 +212,7 @@ func (ds *DataStore) SelectUsers(columns []string, conditions []string) ([]model
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.db.Query(ds.SelectQueryBuilder(TABLENAME_USERS, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(TABLENAME_USERS, columns, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("GetUsers: %v", err)
@@ -249,7 +248,7 @@ func (ds *DataStore) SelectLotRatings(columns []string, conditions []string) ([]
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.db.Query(ds.SelectQueryBuilder(TABLENAME_LR, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(TABLENAME_LR, columns, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("GetLotRatings: %v", err)
@@ -283,7 +282,7 @@ func (ds *DataStore) SelectBugs(columns []string, conditions []string) ([]models
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.db.Query(ds.SelectQueryBuilder(TABLENAME_BUGS, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(TABLENAME_BUGS, columns, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("GetBugs: %v", err)
