@@ -1,7 +1,7 @@
 package api
 
 import (
-	db "RPA/backend/database"
+	"RPA/backend/constants"
 	"RPA/backend/models"
 	"log"
 	"net/http"
@@ -18,34 +18,46 @@ func (api *API) PostCheckIn(c *gin.Context) {
 	err := c.BindJSON(&payload)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err)
-	} else {
-
-		lid, err := strconv.ParseInt(c.Param("lid"), 10, 64)
-		if err != nil {
-			c.IndentedJSON(http.StatusBadRequest, err)
-
-		} else {
-
-			checkInTime := time.Now()
-			var newCheckIn models.Lot_Check_in
-			newCheckIn.LotId = lid
-			newCheckIn.CheckInTime = checkInTime
-			newCheckIn.UserId = payload.UserId
-			//subtract the check in time, by 1 second.
-			//Having a Checkout time that happened before your check in means
-			//you are currenlty check into a parking lot.
-			newCheckIn.CheckOutTime = checkInTime.Add(time.Second * -1)
-
-			checkin_id, err := api.ds.InsertCheckIn(newCheckIn)
-			if err != nil {
-				c.IndentedJSON(http.StatusInternalServerError, err)
-
-			} else {
-				newCheckIn.Id = checkin_id
-				c.IndentedJSON(http.StatusCreated, newCheckIn)
-			}
-		}
+		return
 	}
+
+	lid, err := strconv.ParseInt(c.Param("lid"), 10, 64)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, err)
+		return
+
+	}
+
+	vid, err := strconv.ParseInt(c.Param("vid"), 10, 64)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	venues, err := api.ds.SelectVenues(nil, []string{"Where Id = " + strconv.FormatInt(vid, 10)})
+	if err != nil || len(venues) == 0 || len(venues) > 1 {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	loc, _ := time.LoadLocation(api.ds.GetVenueTimeZone(venues[0].GetPoint()))
+
+	checkInTime := time.Now().In(loc)
+	var checkInResponse models.PostCheckInResponse
+	checkInResponse.CheckInInfo.LotId = lid
+	checkInResponse.CheckInInfo.CheckInTime = checkInTime
+	checkInResponse.CheckInInfo.UserId = payload.UserId
+
+	checkin_id, err := api.ds.InsertCheckIn(checkInResponse.CheckInInfo)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+
+	} else {
+		checkInResponse.CheckInInfo.Id = checkin_id
+		checkInResponse.SpotsTaken, _ = api.ds.CountSpotsTaken(vid, lid)
+		c.IndentedJSON(http.StatusCreated, checkInResponse)
+	}
+
 }
 
 func (api *API) PostLotRating(c *gin.Context) {
@@ -55,27 +67,43 @@ func (api *API) PostLotRating(c *gin.Context) {
 
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err)
-	} else {
-		lid, err := strconv.ParseInt(c.Param("lid"), 10, 64)
-		if err != nil {
-			c.IndentedJSON(http.StatusBadRequest, err)
-		} else {
-
-			var newLotRating models.Lot_Rating
-			newLotRating.LotId = lid
-			newLotRating.Review = payload.Review
-			newLotRating.TimeOfReview = time.Now()
-			newLotRating.UserId = payload.UserId
-
-			lr_id, err := api.ds.InsertLotRating(newLotRating)
-			if err != nil {
-				c.IndentedJSON(http.StatusInternalServerError, err)
-			} else {
-				newLotRating.Id = lr_id
-				c.IndentedJSON(http.StatusCreated, newLotRating)
-			}
-		}
+		return
 	}
+
+	lid, err := strconv.ParseInt(c.Param("lid"), 10, 64)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	vid, err := strconv.ParseInt(c.Param("vid"), 10, 64)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	venues, err := api.ds.SelectVenues(nil, []string{"Where Id = " + strconv.FormatInt(vid, 10)})
+	if err != nil || len(venues) == 0 || len(venues) > 1 {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	loc, _ := time.LoadLocation(api.ds.GetVenueTimeZone(venues[0].GetPoint()))
+
+	var newLotRating models.Lot_Rating
+	newLotRating.LotId = lid
+	newLotRating.Review = payload.Review
+	newLotRating.TimeOfReview = time.Now().In(loc)
+	newLotRating.UserId = payload.UserId
+
+	lr_id, err := api.ds.InsertLotRating(newLotRating)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+	} else {
+		newLotRating.Id = lr_id
+		c.IndentedJSON(http.StatusCreated, newLotRating)
+	}
+
 }
 
 func (api *API) PostBugReport(c *gin.Context) {
@@ -85,21 +113,23 @@ func (api *API) PostBugReport(c *gin.Context) {
 
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err)
-	} else {
-
-		var newBugReport models.Bug
-		newBugReport.BugReport = payload.BugReport
-		newBugReport.UserId = payload.UserId
-
-		b_id, err := api.ds.InsertBugReport(newBugReport)
-
-		if err != nil {
-			c.IndentedJSON(http.StatusInternalServerError, err)
-		}
-
-		newBugReport.Id = b_id
-		c.IndentedJSON(http.StatusCreated, newBugReport)
+		return
 	}
+
+	var newBugReport models.Bug
+	newBugReport.BugReport = payload.BugReport
+	newBugReport.UserId = payload.UserId
+
+	b_id, err := api.ds.InsertBugReport(newBugReport)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	newBugReport.Id = b_id
+	c.IndentedJSON(http.StatusCreated, newBugReport)
+
 }
 
 func (api *API) TryPostUser(c *gin.Context) {
@@ -113,9 +143,9 @@ func (api *API) TryPostUser(c *gin.Context) {
 	}
 
 	var conditions []string
-	conditions = append(conditions, "Where VenueID = "+strconv.Itoa(int(payload.VenueId)))
+	conditions = append(conditions, "Where VenueID = "+strconv.FormatInt(payload.VenueId, 10))
 	conditions = append(conditions, "AND UserName = \""+payload.UserName+"\"")
-	uid, err := api.ds.CheckIfExists(db.TABLENAME_USERS, conditions)
+	uid, err := api.ds.CheckIfExists(constants.TABLENAME_USERS, conditions)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
