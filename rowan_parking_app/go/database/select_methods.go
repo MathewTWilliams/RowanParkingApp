@@ -1,6 +1,7 @@
 package database
 
 import (
+	"RPA/backend/constants"
 	"RPA/backend/models"
 	"database/sql"
 	"encoding/json"
@@ -17,25 +18,16 @@ func (ds *DataStore) SelectQueryBuilder(table string,
 
 	var query strings.Builder
 	query.WriteString("Select ")
-	if cols == nil || len(cols) == 0 {
+	if len(cols) == 0 {
 		query.WriteString("* ")
 	} else {
-		for index, col := range cols {
-			if index+1 < len(cols) {
-				query.WriteString(col + ", ")
-			} else {
-				query.WriteString(col + " ")
-			}
-
-		}
+		ds.AppendValuesToQuery(&query, cols, ", ", " ")
 	}
 
 	query.WriteString("from " + table + " ")
 
-	if conditions != nil && len(conditions) > 0 {
-		for _, cond := range conditions {
-			query.WriteString(cond + " ")
-		}
+	if len(conditions) > 0 {
+		ds.AppendValuesToQuery(&query, conditions, " ", "")
 	}
 
 	query.WriteString(";")
@@ -47,10 +39,10 @@ func (ds *DataStore) SelectVenues(columns []string, conditions []string) ([]mode
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.DB.Query(ds.SelectQueryBuilder(TABLENAME_VENUES, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_VENUES, columns, conditions))
 
 	if err != nil {
-		return nil, fmt.Errorf("Get Venues: %v", err)
+		return nil, fmt.Errorf("get venues: %v", err)
 	}
 
 	defer rows.Close()
@@ -64,21 +56,16 @@ func (ds *DataStore) SelectVenues(columns []string, conditions []string) ([]mode
 		}
 
 		//need to ignore the first 4 bytes added by MySQL
-		vl, err := wkb.Unmarshal(temp[SRID_BYTE_OFFSET:])
+		vl, err := wkb.Unmarshal(temp[constants.SRID_BYTE_OFFSET:])
 		if err != nil {
 			return nil, fmt.Errorf("GetVenues: %v", err)
 		}
 
-		venue.VenueLocation, err = geojson.Encode(vl.(*geom.Point).SetSRID(SRID))
+		venue.VenueLocation, err = geojson.Encode(vl.(*geom.Point).SetSRID(constants.SRID))
 		if err != nil {
 			return nil, fmt.Errorf("GetVenues: %v", err)
 		}
 		venues = append(venues, venue)
-	}
-
-	err = rows.Err()
-	if err != nil {
-		return nil, fmt.Errorf("GetVenues: %v", err)
 	}
 
 	return venues, nil
@@ -90,7 +77,7 @@ func (ds *DataStore) SelectLotTypes(columns []string, conditions []string) ([]mo
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.DB.Query(ds.SelectQueryBuilder(TABLENAME_LT, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_LT, columns, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("GetLotTypes: %v", err)
@@ -109,11 +96,6 @@ func (ds *DataStore) SelectLotTypes(columns []string, conditions []string) ([]mo
 		lot_types = append(lot_types, lot_type)
 	}
 
-	err = rows.Err()
-	if err != nil {
-		return nil, fmt.Errorf("GetLotTypes: %v", err)
-	}
-
 	return lot_types, nil
 
 }
@@ -123,7 +105,7 @@ func (ds *DataStore) SelectLots(columns []string, conditions []string) ([]models
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.DB.Query(ds.SelectQueryBuilder(TABLENAME_LOTS, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_LOTS, columns, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("GetLots: %v", err)
@@ -143,30 +125,25 @@ func (ds *DataStore) SelectLots(columns []string, conditions []string) ([]models
 		}
 
 		//need to ignore the first 4 bytes added by MySQL
-		bb, err := wkb.Unmarshal(tempBB[SRID_BYTE_OFFSET:])
+		bb, err := wkb.Unmarshal(tempBB[constants.SRID_BYTE_OFFSET:])
 		if err != nil {
 			return nil, fmt.Errorf(("GetVenues: %v"), err)
 		}
 
-		ll, err := wkb.Unmarshal(tempLL[SRID_BYTE_OFFSET:])
+		ll, err := wkb.Unmarshal(tempLL[constants.SRID_BYTE_OFFSET:])
 		if err != nil {
 			return nil, fmt.Errorf("GetLots: %v", err)
 		}
 
-		lot.BoundingBox, err = geojson.Encode(bb.(*geom.Polygon).SetSRID(SRID))
+		lot.BoundingBox, err = geojson.Encode(bb.(*geom.Polygon).SetSRID(constants.SRID))
 		if err != nil {
 			return nil, fmt.Errorf("GetLots: %v", err)
 		}
-		lot.LotLocation, err = geojson.Encode(ll.(*geom.Point).SetSRID(SRID))
+		lot.LotLocation, err = geojson.Encode(ll.(*geom.Point).SetSRID(constants.SRID))
 		if err != nil {
 			return nil, fmt.Errorf("GetLots: %v", err)
 		}
 		lots = append(lots, lot)
-	}
-
-	err = rows.Err()
-	if err != nil {
-		return nil, fmt.Errorf("GetLots: %v", err)
 	}
 
 	return lots, nil
@@ -178,7 +155,7 @@ func (ds *DataStore) SelectLotCheckIns(columns []string, conditions []string) ([
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.DB.Query(ds.SelectQueryBuilder(TABLENAME_LCI, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_LCI, columns, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("GetLotCheckIns: %v", err)
@@ -198,11 +175,6 @@ func (ds *DataStore) SelectLotCheckIns(columns []string, conditions []string) ([
 		check_ins = append(check_ins, lci)
 	}
 
-	err = rows.Err()
-	if err != nil {
-		return nil, fmt.Errorf("GetLotCheckIns: %v", err)
-	}
-
 	return check_ins, nil
 
 }
@@ -212,7 +184,7 @@ func (ds *DataStore) SelectUsers(columns []string, conditions []string) ([]model
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.DB.Query(ds.SelectQueryBuilder(TABLENAME_USERS, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_USERS, columns, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("GetUsers: %v", err)
@@ -234,11 +206,6 @@ func (ds *DataStore) SelectUsers(columns []string, conditions []string) ([]model
 		users = append(users, user)
 	}
 
-	err = rows.Err()
-	if err != nil {
-		return nil, fmt.Errorf("GetUsers: %v", err)
-	}
-
 	return users, nil
 
 }
@@ -248,7 +215,7 @@ func (ds *DataStore) SelectLotRatings(columns []string, conditions []string) ([]
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.DB.Query(ds.SelectQueryBuilder(TABLENAME_LR, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_LR, columns, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("GetLotRatings: %v", err)
@@ -268,11 +235,6 @@ func (ds *DataStore) SelectLotRatings(columns []string, conditions []string) ([]
 		ratings = append(ratings, rating)
 	}
 
-	err = rows.Err()
-	if err != nil {
-		return nil, fmt.Errorf("GetLotRatings: %v", err)
-	}
-
 	return ratings, nil
 
 }
@@ -282,7 +244,7 @@ func (ds *DataStore) SelectBugs(columns []string, conditions []string) ([]models
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.DB.Query(ds.SelectQueryBuilder(TABLENAME_BUGS, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_BUGS, columns, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("GetBugs: %v", err)
@@ -299,11 +261,6 @@ func (ds *DataStore) SelectBugs(columns []string, conditions []string) ([]models
 		}
 
 		bugs = append(bugs, bug)
-	}
-
-	err = rows.Err()
-	if err != nil {
-		return nil, fmt.Errorf("GetBugs: %v", err)
 	}
 
 	return bugs, nil
