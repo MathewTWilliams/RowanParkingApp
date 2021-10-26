@@ -10,8 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//make our methods part of the DataStore struct so we can access db without
-// the need for global variables
 func (api *API) GetVenues(c *gin.Context) {
 	var venues []models.Venue
 	var err error
@@ -47,7 +45,6 @@ func (api *API) GetVenueById(c *gin.Context) {
 
 }
 
-//Need to return the number of spots taken for each lot
 func (api *API) GetLotsFromVenue(c *gin.Context) {
 	var lots []models.Lot
 	var err error
@@ -63,11 +60,20 @@ func (api *API) GetLotsFromVenue(c *gin.Context) {
 	} else if len(lots) == 0 {
 		c.IndentedJSON(http.StatusNoContent, []models.Lot{})
 	} else {
-		c.IndentedJSON(http.StatusOK, lots)
+		var responses []models.GetLotResponse
+		for _, lot := range lots {
+			spots, err := api.ds.CountSpotsTaken(lot.VenueId, lot.Id)
+			if err != nil {
+				c.IndentedJSON(http.StatusInternalServerError, err)
+				return
+			}
+			responses = append(responses, models.GetLotResponse{SpotsTaken: spots, LotInfo: lot})
+		}
+
+		c.IndentedJSON(http.StatusOK, responses)
 	}
 }
 
-//Needs to return number of spots taken in lot
 func (api *API) GetLotFromVenue(c *gin.Context) {
 	var queryResult []models.Lot
 	var err error
@@ -86,6 +92,12 @@ func (api *API) GetLotFromVenue(c *gin.Context) {
 	} else if len(queryResult) == 0 || len(queryResult) > 1 {
 		c.IndentedJSON(http.StatusNoContent, models.Lot{})
 	} else {
-		c.IndentedJSON(http.StatusOK, queryResult[0])
+		lot := queryResult[0]
+		spots, err := api.ds.CountSpotsTaken(lot.VenueId, lot.Id)
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, err)
+			return
+		}
+		c.IndentedJSON(http.StatusOK, models.GetLotResponse{SpotsTaken: spots, LotInfo: lot})
 	}
 }
