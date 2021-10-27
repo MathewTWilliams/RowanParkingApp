@@ -14,13 +14,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/catmullet/tz"
 	"github.com/go-sql-driver/mysql"
 	geom "github.com/twpayne/go-geom"
-	tzmapper "github.com/zsefvlol/timezonemapper"
 )
 
 type DataStore struct {
 	*sql.DB
+	tzLookup tz.GeoJsonLookup
 }
 
 func (ds *DataStore) InitDB() {
@@ -46,6 +47,7 @@ func (ds *DataStore) InitDB() {
 		log.Fatal(pingErr)
 	}
 
+	ds.tzLookup, _ = tz.NewTZ()
 	fmt.Println("Connected!")
 }
 
@@ -54,7 +56,7 @@ func (ds *DataStore) GetVenueTimeZone(point *geom.Point) string {
 	lat := points[0]
 	long := points[1]
 
-	return tzmapper.LatLngToTimezoneString(lat, long)
+	return ds.tzLookup.TimeZone(lat, long)
 
 }
 
