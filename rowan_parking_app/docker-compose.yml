@@ -3,7 +3,6 @@ services:
     db:
         image: mariadb:10.6
         container_name: db
-        restart: unless-stopped
         ports:
             - 3306:3306
         environment:
@@ -15,11 +14,10 @@ services:
             - ./docker-data/mysql:/var/lib/mysql
     parking:
         container_name: parking
-        restart: unless-stopped
         build: .
         image: parking:latest
         ports:
-            - 8080:80
+            - 80:80
         environment:
             - DBUSER=${DBUSER}
             - DBPASS=${DBPASS}
