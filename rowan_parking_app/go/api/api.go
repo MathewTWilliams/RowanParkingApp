@@ -38,6 +38,6 @@ func (api *API) InitAPI(ds *db.DataStore) {
 }
 
 func (api *API) StartListening() {
-	api.router.Run("localhost:80")
+	api.router.Run(":80")
 
 }
