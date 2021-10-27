@@ -14,14 +14,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/catmullet/tz"
 	"github.com/go-sql-driver/mysql"
-	geom "github.com/twpayne/go-geom"
 )
 
 type DataStore struct {
 	*sql.DB
-	tzLookup tz.GeoJsonLookup
 }
 
 func (ds *DataStore) InitDB() {
@@ -47,18 +44,17 @@ func (ds *DataStore) InitDB() {
 		log.Fatal(pingErr)
 	}
 
-	ds.tzLookup, _ = tz.NewTZ()
 	fmt.Println("Connected!")
 }
 
-func (ds *DataStore) GetVenueTimeZone(point *geom.Point) string {
+/*func (ds *DataStore) GetVenueTimeZone(point *geom.Point) string {
 	points := point.FlatCoords()
 	lat := points[0]
 	long := points[1]
 
-	return ds.tzLookup.TimeZone(lat, long)
 
-}
+
+}*/
 
 //Given a check in time and check out time, determine if a spot is being occupied.
 //A spot is being occupied if: the check in date matches the time_now date (after timezone conversion),

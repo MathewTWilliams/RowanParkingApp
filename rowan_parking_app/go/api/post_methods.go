@@ -40,9 +40,9 @@ func (api *API) PostCheckIn(c *gin.Context) {
 		return
 	}
 
-	loc, _ := time.LoadLocation(api.ds.GetVenueTimeZone(venues[0].GetPoint()))
+	//loc, _ := time.LoadLocation(api.ds.GetVenueTimeZone(venues[0].GetPoint()))
 
-	checkInTime := time.Now().In(loc)
+	checkInTime := time.Now() //.In(loc)
 	var checkInResponse models.PostCheckInResponse
 	checkInResponse.CheckInInfo.LotId = lid
 	checkInResponse.CheckInInfo.CheckInTime = checkInTime
@@ -88,12 +88,12 @@ func (api *API) PostLotRating(c *gin.Context) {
 		return
 	}
 
-	loc, _ := time.LoadLocation(api.ds.GetVenueTimeZone(venues[0].GetPoint()))
+	//loc, _ := time.LoadLocation(api.ds.GetVenueTimeZone(venues[0].GetPoint()))
 
 	var newLotRating models.Lot_Rating
 	newLotRating.LotId = lid
 	newLotRating.Review = payload.Review
-	newLotRating.TimeOfReview = time.Now().In(loc)
+	newLotRating.TimeOfReview = time.Now() //.In(loc)
 	newLotRating.UserId = payload.UserId
 
 	lr_id, err := api.ds.InsertLotRating(newLotRating)
