@@ -101,9 +101,19 @@ class CheckinBox extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            Text(lotName, style: const TextStyle(fontWeight:
-            FontWeight.bold)),Text(rating), Text(permission),
-            ElevatedButton( child: const Text('Lot Info'),
+            Expanded(
+                child: Container(
+                    padding: EdgeInsets.all(5),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Text(lotName, style: const TextStyle(fontWeight:
+                          FontWeight.bold)), Text(rating), Text(permission),
+                        ]
+                    )
+                )
+            ),
+            ElevatedButton(child: const Text('Lot Info'),
               onPressed: (){ //Navigates to the Checkout screen
                 Navigator.push(context,
                   MaterialPageRoute(builder: (context)=> const CheckinWidget()),
@@ -112,9 +122,7 @@ class CheckinBox extends StatelessWidget {
             ),
           ],
         ),
-
       ),
-
     );
   }
 }
