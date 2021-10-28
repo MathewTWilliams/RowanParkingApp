@@ -1,14 +1,9 @@
-FROM alpine:3.14
-
+FROM golang:1.16-alpine
 WORKDIR /build
-
 ADD go/ .
+RUN go build .;
 
-RUN apk update; \
-	apk add go; \
-	go build .; \
-	mkdir /var/www; \
-	cp backend /var/www/backend;
-
+FROM alpine:3.14
 WORKDIR /var/www
+COPY --from=0 /build/backend .
 ENTRYPOINT ./backend

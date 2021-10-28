@@ -33,8 +33,9 @@ func (ds *DataStore) InsertCheckIn(checkIn models.Lot_Check_in) (int64, error) {
 	cols := []string{"Id", "LotId", "CheckInTime", "CheckOutTime", "UserId"}
 
 	query := ds.InsertQueryBuilder(constants.TABLENAME_LCI, cols)
+	// Pass in nil for CheckIn.CheckOutTime
 	result, err := ds.Exec(query, checkIn.Id, checkIn.LotId,
-		checkIn.CheckInTime, checkIn.CheckOutTime, checkIn.UserId)
+		checkIn.CheckInTime, nil, checkIn.UserId)
 
 	if err != nil {
 		return -1, fmt.Errorf("InsertCheckIn: %v", err)

@@ -1,15 +1,17 @@
 import 'dart:convert';
 
-import 'checkin_widget.dart';
+import 'lotinfo_widget.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:http/http.dart' as http;
 
-const String serverURL = "18.118.241.218";
+const String serverURL = "3.137.195.9";
 
 void main() => runApp(const MaterialApp(home: LotsWidget()));
+
+//figure out how to grab information from the server than convert them to strings here
 
 class LotsWidget extends StatefulWidget {
   const LotsWidget({Key? key}) : super(key: key);
@@ -31,44 +33,38 @@ class LotsWidgetState extends State<LotsWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: ListView(
-      shrinkWrap: true,
-      padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
-      children: <Widget>[
-        CheckinBox(
-            lotName: 'Lot O', rating: 'x/201 Spaces', permission: 'Commuter'),
-        CheckinBox(
-            lotName: 'Lot P', rating: 'x/524 Spaces', permission: 'Commuter'),
-        CheckinBox(
-            lotName: 'Lot W', rating: 'X/Y Spaces', permission: 'Residential'),
-        CheckinBox(
-            lotName: 'Lot A-1', rating: 'X/Y Spaces', permission: 'Employee'),
-      ],
-    ));
+          shrinkWrap: true, padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
+          children: <Widget> [
+            CheckinBox(
+                lotName: 'Lot O',
+                permission: 'Commuter'),
+            CheckinBox(
+                lotName: 'Lot O-1',
+                permission: 'Employee Only until 4pm'),
+            CheckinBox(
+                lotName: 'Lot P',
+                permission: 'Commuter'),
+            CheckinBox(
+                lotName: 'Lot D',
+                permission: 'Commuter'),
+            CheckinBox(
+              lotName: 'Lot A',
+              permission: 'Commuter'),
+          ],
+        )
+    );
   }
 }
 
 class Lots {
-  final int userId;
-  final int id;
-  final String title;
-
-  Lots({
-    required this.userId,
-    required this.id,
-    required this.title,
-  });
-
-  factory Lots.fromJson(Map<String, dynamic> json) {
-    return Lots(
-      userId: json['userId'],
-      id: json['id'],
-      title: json['title'],
-    );
-  }
+  int venueId;
+  int id;
+  String title;
+  int spotsTaken;
+  int numSpaces;
 
   static Future<Lots> getLots() async {
-    final response = await http
-        .get(Uri.parse('https://jsonplaceholder.typicode.com/albums/1'));
+    final response = await http.get(Uri.parse('http://3.137.195.9/api/venues/1/lots/1'));
 
     if (response.statusCode == 200) {
       return Lots.fromJson(jsonDecode(response.body));
@@ -76,15 +72,31 @@ class Lots {
       throw Exception('Received invalid server response trying to GET Lots');
     }
   }
+
+  Lots({
+    required this.venueId,
+    required this.id,
+    required this.title,
+    required this.numSpaces,
+    required this.spotsTaken,
+  });
+
+  factory Lots.fromJson(Map<String, dynamic> json) {
+    return Lots(
+      venueId: json['VenueId'],
+      id: json['Id'],
+      title: json['LotName'],
+      numSpaces: json['NumSpaces'],
+      spotsTaken: json['SpotsTaken'],
+    );
+  }
 }
 
 // Holds the information for what goes into the CheckinBox for the above listView
 class CheckinBox extends StatelessWidget {
-  CheckinBox(
-      {required this.lotName, required this.rating, required this.permission});
-  final String lotName;
-  final String rating;
-  final String permission;
+  CheckinBox({required this.lotName, required this.permission});
+  String lotName;
+  String permission;
 
   @override
   Widget build(BuildContext context) {
@@ -108,32 +120,66 @@ class CheckinBox extends StatelessWidget {
                           Text(permission),
                         ]))),
             ElevatedButton(
-              child: const Text('Lot Info'),
-              onPressed: () {
-                //Navigates to the Checkout screen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const CheckinWidget()),
+              if(lotName == 'Lot O'){
+                Navigator.push(context,
+                  MaterialPageRoute(builder: (context)=> LotOWidget()),
                 );
+              }
+              if(lotName == 'Lot O-1'){
+                Navigator.push(context,
+                  MaterialPageRoute(builder: (context)=> LotO1Widget()),
+                );
+              }
+              if(lotName == 'Lot P'){
+                Navigator.push(context,
+                  MaterialPageRoute(builder: (context)=> LotPWidget()),
+                );
+              }
+              if(lotName == 'Lot D'){
+                Navigator.push(context,
+                  MaterialPageRoute(builder: (context)=> LotDWidget()),
+                );
+              }
+              if(lotName == 'Lot A'){
+                Navigator.push(context,
+                MaterialPageRoute(builder: (context)=> LotAWidget()),
+                );
+              }
+              else{ print("That lof doesn't have info yet. Sorry!");}
               },
             ),
           ],
         ),
-      ),
     );
   }
 }
 
-/* Code removed from the original
+/* Code removed from the original, it originally replaced the Scaffold() in the build Widget
 return FutureBuilder<Lots>(
-future: futureLots,
-builder: (context, snapshot) {
-if (snapshot.hasData) {
-return Text(snapshot.data!.userId.toString());
-} else {
-return Text('${snapshot.error}');
-}
-},
-);
- */
+  future: futureLots,
+  builder: (context, snapshot) {
+    if (snapshot.hasData) {
+    return Text(snapshot.data!.SpotsTaken.toString());
+      } else {
+        return Text('${snapshot.error}');
+     }
+   },
+ );
+ //As above but just under the CheckinBox(), in the Scaffold portion of the app
+             Column(
+              children: <Widget>[
+                Center(
+                  child: FutureBuilder<Lots>(
+                    future: futureLots,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Text(snapshot.data!.spotsTaken.toString());
+                      } else {
+                        return Text('${snapshot.error}');
+                      }
+                    },
+                  ),
+                )
+                ],
+            ),
+*/

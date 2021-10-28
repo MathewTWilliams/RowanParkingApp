@@ -19,10 +19,6 @@ type RegisterUserPayload struct {
 	VenueId  int64  `json:"VenueId"`
 }
 
-type RegisterUserResponse struct {
-	UserId int64 `json:"UserId"`
-}
-
 type GetLotResponse struct {
 	SpotsTaken int64 `json:"SpotsTaken"`
 	LotInfo    Lot   `json:"LotInfo"`
