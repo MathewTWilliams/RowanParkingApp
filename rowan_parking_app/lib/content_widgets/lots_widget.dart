@@ -31,27 +31,19 @@ class LotsWidgetState extends State<LotsWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: ListView(
-          shrinkWrap: true, padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
-          children: <Widget> [
-            CheckinBox(
-                lotName: 'Lot O',
-                rating: 'x/201 Spaces',
-                permission: 'Commuter'),
-            CheckinBox(
-                lotName: 'Lot P',
-                rating: 'x/524 Spaces',
-                permission: 'Commuter'),
-            CheckinBox(
-                lotName: 'Lot W',
-                rating: 'X/Y Spaces',
-                permission: 'Residential'),
-            CheckinBox(
-                lotName: 'Lot A-1',
-                rating: 'X/Y Spaces',
-                permission: 'Employee'),
-          ],
-        )
-    );
+      shrinkWrap: true,
+      padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
+      children: <Widget>[
+        CheckinBox(
+            lotName: 'Lot O', rating: 'x/201 Spaces', permission: 'Commuter'),
+        CheckinBox(
+            lotName: 'Lot P', rating: 'x/524 Spaces', permission: 'Commuter'),
+        CheckinBox(
+            lotName: 'Lot W', rating: 'X/Y Spaces', permission: 'Residential'),
+        CheckinBox(
+            lotName: 'Lot A-1', rating: 'X/Y Spaces', permission: 'Employee'),
+      ],
+    ));
   }
 }
 
@@ -88,7 +80,8 @@ class Lots {
 
 // Holds the information for what goes into the CheckinBox for the above listView
 class CheckinBox extends StatelessWidget {
-  CheckinBox({required this.lotName, required this.rating, required this.permission});
+  CheckinBox(
+      {required this.lotName, required this.rating, required this.permission});
   final String lotName;
   final String rating;
   final String permission;
@@ -96,7 +89,8 @@ class CheckinBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(8), height: 120,
+      padding: const EdgeInsets.all(8),
+      height: 120,
       child: Card(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -107,16 +101,20 @@ class CheckinBox extends StatelessWidget {
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
-                          Text(lotName, style: const TextStyle(fontWeight:
-                          FontWeight.bold)), Text(rating), Text(permission),
-                        ]
-                    )
-                )
-            ),
-            ElevatedButton(child: const Text('Lot Info'),
-              onPressed: (){ //Navigates to the Checkout screen
-                Navigator.push(context,
-                  MaterialPageRoute(builder: (context)=> const CheckinWidget()),
+                          Text(lotName,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold)),
+                          Text(rating),
+                          Text(permission),
+                        ]))),
+            ElevatedButton(
+              child: const Text('Lot Info'),
+              onPressed: () {
+                //Navigates to the Checkout screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const CheckinWidget()),
                 );
               },
             ),

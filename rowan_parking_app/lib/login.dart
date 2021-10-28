@@ -1,4 +1,5 @@
-import 'dart:async';
+// @dart=2.7
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -26,10 +27,10 @@ const String AUTH0_ISSUER = 'https://$AUTH0_DOMAIN';
 
 class Profile extends StatelessWidget {
   final Future<void> Function() logoutAction;
-  final String? name;
-  final String? picture;
+  final String name;
+  final String picture;
 
-  const Profile(this.logoutAction, this.name, this.picture, {Key? key})
+  const Profile(this.logoutAction, this.name, this.picture, {Key key})
       : super(key: key);
 
   @override
@@ -69,9 +70,9 @@ class Profile extends StatelessWidget {
 
 class Login extends StatelessWidget {
   final Future<void> Function() loginAction;
-  final String? loginError;
+  final String loginError;
 
-  const Login(this.loginAction, this.loginError, {Key? key}) : super(key: key);
+  const Login(this.loginAction, this.loginError, {Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +98,7 @@ class Login extends StatelessWidget {
 void main() => runApp(const MyApp());
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({Key key}) : super(key: key);
 
   @override
   _MyAppState createState() => _MyAppState();
@@ -110,9 +111,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   bool isBusy = false;
   bool isLoggedIn = false;
-  String? errorMessage;
-  String? name;
-  String? picture;
+  String errorMessage;
+  String name;
+  String picture;
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +134,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Map<String, Object>? parseIdToken(String idToken) {
+  Map<String, Object> parseIdToken(String idToken) {
     final List<String> parts = idToken.split('.');
     assert(parts.length == 3);
 
@@ -141,10 +142,10 @@ class _MyAppState extends State<MyApp> {
         utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))));
   }
 
-  Future<Map<String, Object>?> getUserDetails(String? accessToken) async {
+  Future<Map<String, Object>> getUserDetails(String accessToken) async {
     const String url = 'https://$AUTH0_DOMAIN/userinfo';
     final http.Response response = await http.get(
-      Uri.parse(url),
+      url,
       headers: <String, String>{'Authorization': 'Bearer $accessToken'},
     );
 
@@ -163,7 +164,7 @@ class _MyAppState extends State<MyApp> {
 
     try {
       final AuthorizationTokenResponse result =
-          await (appAuth.authorizeAndExchangeCode(
+          await appAuth.authorizeAndExchangeCode(
         AuthorizationTokenRequest(
           AUTH0_CLIENT_ID,
           AUTH0_REDIRECT_URI,
@@ -171,10 +172,10 @@ class _MyAppState extends State<MyApp> {
           scopes: <String>['openid', 'profile', 'offline_access'],
           // promptValues: ['login']
         ),
-      ) as FutureOr<AuthorizationTokenResponse>);
+      );
 
-      final Map<String, Object>? idToken = parseIdToken(result.idToken!);
-      final Map<String, Object>? profile =
+      final Map<String, Object> idToken = parseIdToken(result.idToken);
+      final Map<String, Object> profile =
           await getUserDetails(result.accessToken);
 
       await secureStorage.write(
@@ -183,8 +184,8 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         isBusy = false;
         isLoggedIn = true;
-        name = idToken!['name'].toString();
-        picture = profile!['picture'].toString();
+        name = idToken['name'];
+        picture = profile['picture'];
       });
     } on Exception catch (e, s) {
       debugPrint('login error: $e - stack: $s');
@@ -212,7 +213,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> initAction() async {
-    final String? storedRefreshToken =
+    final String storedRefreshToken =
         await secureStorage.read(key: 'refresh_token');
     if (storedRefreshToken == null) return;
 
@@ -221,15 +222,15 @@ class _MyAppState extends State<MyApp> {
     });
 
     try {
-      final TokenResponse response = await (appAuth.token(TokenRequest(
+      final TokenResponse response = await appAuth.token(TokenRequest(
         AUTH0_CLIENT_ID,
         AUTH0_REDIRECT_URI,
         issuer: AUTH0_ISSUER,
         refreshToken: storedRefreshToken,
-      )) as FutureOr<TokenResponse>);
+      ));
 
-      final Map<String, Object>? idToken = parseIdToken(response.idToken!);
-      final Map<String, Object>? profile =
+      final Map<String, Object> idToken = parseIdToken(response.idToken);
+      final Map<String, Object> profile =
           await getUserDetails(response.accessToken);
 
       await secureStorage.write(
@@ -238,8 +239,8 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         isBusy = false;
         isLoggedIn = true;
-        name = idToken!['name'].toString();
-        picture = profile!['picture'].toString();
+        name = idToken['name'];
+        picture = profile['picture'];
       });
     } on Exception catch (e, s) {
       debugPrint('error on refresh token: $e - stack: $s');
