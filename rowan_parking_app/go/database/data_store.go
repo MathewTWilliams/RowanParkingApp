@@ -59,11 +59,7 @@ func (ds *DataStore) InitDB() {
 //Given a check in time and check out time, determine if a spot is being occupied.
 //A spot is being occupied if: the check in date matches the time_now date (after timezone conversion),
 //and if the check_out time is nil
-func (ds *DataStore) IsOccupyingSpot(check_in *time.Time, check_out *time.Time) bool {
-
-	if check_out == nil {
-		return false
-	}
+func (ds *DataStore) IsOccupyingSpot(check_in time.Time, check_out time.Time) bool {
 
 	time_now := time.Now().In(check_in.Location())
 	if check_in.Year() == time_now.Year() &&
@@ -93,21 +89,22 @@ func (ds *DataStore) CountSpotsTaken(vid int64, lid int64) (int64, error) {
 	rows, err = ds.DB.Query(q)
 
 	if err != nil {
+		log.Println(err.Error())
 		return -1, fmt.Errorf("CountSpotsTaken: %v", err)
 	}
 
 	defer rows.Close()
 
 	for rows.Next() {
-		var check_in *time.Time
-		var check_out *time.Time
-
-		err = rows.Scan(check_in, check_out)
+		var check_in time.Time
+		var check_out_null sql.NullTime
+		err = rows.Scan(&check_in, &check_out_null)
 		if err != nil {
+			log.Println(err.Error())
 			return -1, fmt.Errorf("CountSpotsTaken: %v", err)
 		}
 
-		if ds.IsOccupyingSpot(check_in, check_out) {
+		if check_out_null.Valid && ds.IsOccupyingSpot(check_in, check_out_null.Time) {
 			count += 1
 		}
 	}
@@ -115,7 +112,7 @@ func (ds *DataStore) CountSpotsTaken(vid int64, lid int64) (int64, error) {
 	return count, nil
 }
 
-func (ds *DataStore) CheckIfExists(tablename string, conditions []string) (int64, error) {
+func (ds *DataStore) CheckIfExists(tablename string, conditions []string) int64 {
 	var query strings.Builder
 	var err error
 	var id int64
@@ -133,10 +130,10 @@ func (ds *DataStore) CheckIfExists(tablename string, conditions []string) (int64
 	err = result.Scan(&id)
 
 	if err != nil {
-		return -1, fmt.Errorf("check if exists query: %v", err)
+		return -1
 	}
 
-	return id, nil
+	return id
 
 }
 

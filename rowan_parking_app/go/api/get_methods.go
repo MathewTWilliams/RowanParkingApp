@@ -84,7 +84,7 @@ func (api *API) GetLotFromVenue(c *gin.Context) {
 	var conditions []string
 
 	conditions = append(conditions, "Where VenueID = "+vid)
-	conditions = append(conditions, " AND LotId = "+lid)
+	conditions = append(conditions, " AND Id = "+lid)
 
 	queryResult, err = api.ds.SelectLots(nil, conditions)
 	if err != nil {
