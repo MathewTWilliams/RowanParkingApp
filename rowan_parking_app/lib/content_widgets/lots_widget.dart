@@ -155,7 +155,7 @@ class CheckinBox extends StatelessWidget {
   }
 }
 
-/* Code removed from the original
+/* Code removed from the original, it originally replaced the Scaffold() in the build Widget
 return FutureBuilder<Lots>(
   future: futureLots,
   builder: (context, snapshot) {
@@ -166,7 +166,7 @@ return FutureBuilder<Lots>(
      }
    },
  );
- //As above but into the CheckinBox in the Scaffold portion of the app
+ //As above but just under the CheckinBox(), in the Scaffold portion of the app
              Column(
               children: <Widget>[
                 Center(
