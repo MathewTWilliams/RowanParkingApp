@@ -101,8 +101,7 @@ class CheckinBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(8),
-      height: 120,
+      padding: const EdgeInsets.all(8), height: 120,
       child: Card(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -113,13 +112,14 @@ class CheckinBox extends StatelessWidget {
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
-                          Text(lotName,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold)),
-                          Text(rating),
-                          Text(permission),
-                        ]))),
-            ElevatedButton(
+                          Text(lotName, style: const TextStyle(fontWeight:
+                          FontWeight.bold)), Text(permission),
+                        ]
+                    )
+                )
+            ),
+            ElevatedButton(child: const Text('Lot Info'),
+              onPressed: (){ //Navigates to the Checkout screen
               if(lotName == 'Lot O'){
                 Navigator.push(context,
                   MaterialPageRoute(builder: (context)=> LotOWidget()),
@@ -150,6 +150,7 @@ class CheckinBox extends StatelessWidget {
             ),
           ],
         ),
+      ),
     );
   }
 }
