@@ -17,7 +17,7 @@ services:
         build: .
         image: parking:latest
         ports:
-            - 80:80
+            - 80:8080
         environment:
             - DBUSER=${DBUSER}
             - DBPASS=${DBPASS}
