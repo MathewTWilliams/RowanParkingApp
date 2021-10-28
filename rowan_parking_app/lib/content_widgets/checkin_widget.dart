@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
+import 'lotinfo_widget.dart';
+
 
 void main() => runApp(const MaterialApp(home: CheckinWidget()));
 
@@ -10,83 +12,62 @@ class CheckinWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-            title: const Text("Lot Information")
-        ),
-      body: ListView(
-        shrinkWrap: true, padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
-        children: <Widget> [
-          LotInfoBox(
-              rating: 'Good Availability',
-              lotName: 'Lot O',
-              permission: 'Commuter'),
-          ElevatedButton( child: const Text('Check-in'),
-            onPressed: (){ //Navigates to the Checkout screen
-              Navigator.push(context,
-                MaterialPageRoute(builder: (context)=> const CheckoutWidget()),
-              );
-            },
-          ),
-        ],
-      )
-    );
-  }
-}
-
-/* Basic CheckinBox used above
-CheckinBox(
-  rating: 'No Availability',
-  lotName: 'Lot A-1',
-  permission: 'Employee'),
- */
-
-// Holds the information for what goes into the LotInfoBox for the above listView
-class LotInfoBox extends StatelessWidget {
-  LotInfoBox({required this.rating, required this.lotName, required this.permission});
-  final String rating;
-  final String lotName;
-  final String permission;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8), height: 120,
-        child: Card(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Text(rating, style: const TextStyle(fontWeight:
-                FontWeight.bold)), Text(lotName), Text(permission),
-            ],
-          ),
-
-        ),
-
-    );
-  }
-}
-
-/*
-**********************************
-  HERE STARTS THEW CHECKOUT PAGE
-**********************************
-*/
-class CheckoutWidget extends StatelessWidget{
-  const CheckoutWidget({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context){
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Ready to Check-Out?")
-      ),
         body: ListView(
-          shrinkWrap: true, padding: const EdgeInsets.fromLTRB(10.0, 50.0, 10.0, 20.0),
+          shrinkWrap: true, padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
           children: <Widget> [
-            CheckoutBox(rating: 'Test Rating', lotName: 'Test Name'),
-            ElevatedButton( child: const Text('Check-out of this lot'),
-              onPressed: (){
-                Navigator.pop(context);
+            CheckinBox(
+                lotName: 'Lot O',
+                spaces: 'x/201 Spaces',
+                permission: 'Commuter'),
+            ElevatedButton(child: const Text('Check Into Lot O'),
+              onPressed: (){ //Navigates to the Checkout screen
+                Navigator.push(context,
+                  MaterialPageRoute(builder: (context)=> CheckoutWidget(nameLot: 'Lot O',)),
+                );
+              },
+            ),
+            CheckinBox(
+                lotName: 'Lot O-1',
+                spaces: 'X/296 Spaces',
+                permission: 'Employee Only until 4pm'),
+            ElevatedButton(child: const Text('Check Into Lot O-1'),
+              onPressed: (){ //Navigates to the Checkout screen
+                Navigator.push(context,
+                  MaterialPageRoute(builder: (context)=> CheckoutWidget(nameLot: 'Lot O-1',)),
+                );
+              },
+            ),
+            CheckinBox(
+                lotName: 'Lot P',
+                spaces: 'x/524 Spaces',
+                permission: 'Commuter'),
+            ElevatedButton(child: const Text('Check Into Lot P'),
+              onPressed: (){ //Navigates to the Checkout screen
+                Navigator.push(context,
+                  MaterialPageRoute(builder: (context)=> CheckoutWidget(nameLot: 'Lot P',)),
+                );
+              },
+            ),
+            CheckinBox(
+                lotName: 'Lot D',
+                spaces: 'X/391 Spaces',
+                permission: 'Commuter'),
+            ElevatedButton(child: const Text('Check Into Lot D'),
+              onPressed: (){ //Navigates to the Checkout screen
+                Navigator.push(context,
+                  MaterialPageRoute(builder: (context)=> CheckoutWidget(nameLot: 'Lot D',)),
+                );
+              },
+            ),
+            CheckinBox(
+                lotName: 'Lot A',
+                spaces: 'X/200 Spaces',
+                permission: 'Commuter'),
+            ElevatedButton(child: const Text('Check Into Lot A'),
+              onPressed: (){ //Navigates to the Checkout screen
+                Navigator.push(context,
+                  MaterialPageRoute(builder: (context)=> CheckoutWidget(nameLot: 'Lot A',)),
+                );
               },
             ),
           ],
@@ -95,25 +76,36 @@ class CheckoutWidget extends StatelessWidget{
   }
 }
 
-//This holds the information for what goes into the checkout box listed above
-class CheckoutBox extends StatelessWidget {
-  CheckoutBox({required this.rating, required this.lotName});
-  final String rating;
-  final String lotName;
+class CheckinBox extends StatelessWidget {
+  CheckinBox({required this.lotName, required this.spaces, required this.permission});
+  String lotName;
+  String spaces;
+  String permission;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: const EdgeInsets.all(2), height: 120, child: Card(
+      padding: const EdgeInsets.all(8), height: 120,
+      child: Card(
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
-          Text(rating, style: const TextStyle(fontWeight:
-          FontWeight.bold)), Text(lotName),
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Expanded(
+                child: Container(
+                    padding: const EdgeInsets.all(5),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Text(lotName, style: const TextStyle(fontWeight:
+                          FontWeight.bold)), Text(spaces), Text(permission),
+                        ]
+                    )
+                )
+            ),
+            //put the button here again if you want to remake it
           ],
-        )
-        )
+        ),
+      ),
     );
   }
 }
-
-
