@@ -34,11 +34,11 @@ func (api *API) PostCheckIn(c *gin.Context) {
 		return
 	}
 
-	venues, err := api.ds.SelectVenues(nil, []string{"Where Id = " + strconv.FormatInt(vid, 10)})
+	/*venues, err := api.ds.SelectVenues(nil, []string{"Where Id = " + strconv.FormatInt(vid, 10)})
 	if err != nil || len(venues) == 0 || len(venues) > 1 {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 		return
-	}
+	}*/
 
 	//loc, _ := time.LoadLocation(api.ds.GetVenueTimeZone(venues[0].GetPoint()))
 
@@ -145,12 +145,9 @@ func (api *API) TryPostUser(c *gin.Context) {
 	var conditions []string
 	conditions = append(conditions, "Where VenueID = "+strconv.FormatInt(payload.VenueId, 10))
 	conditions = append(conditions, "AND UserName = \""+payload.UserName+"\"")
-	uid, err := api.ds.CheckIfExists(constants.TABLENAME_USERS, conditions)
+	uid := api.ds.CheckIfExists(constants.TABLENAME_USERS, conditions)
 
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, err)
-		return
-	} else if uid < 0 {
+	if uid < 0 {
 		var user models.User
 		user.Settings = models.SettingsJson{TextSize: 14, Language: "English"}
 		user.UserName = payload.UserName
@@ -166,6 +163,12 @@ func (api *API) TryPostUser(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, models.RegisterUserResponse{UserId: uid})
+	users, err := api.ds.SelectUsers(nil, []string{"Where Id = " + strconv.FormatInt(uid, 10)})
+	if err != nil || len(users) == 0 || len(users) > 1 {
+		log.Println(err.Error())
+		c.IndentedJSON(http.StatusInternalServerError, err)
+	}
+
+	c.IndentedJSON(http.StatusOK, users[0])
 
 }

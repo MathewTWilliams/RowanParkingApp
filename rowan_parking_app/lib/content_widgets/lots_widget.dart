@@ -7,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:http/http.dart' as http;
 
-const String serverURL = "18.118.241.218";
+const String serverURL = "3.137.195.9";
 
 void main() => runApp(const MaterialApp(home: LotsWidget()));
 
@@ -38,17 +38,17 @@ class LotsWidgetState extends State<LotsWidget> {
                 rating: 'x/201 Spaces',
                 permission: 'Commuter'),
             CheckinBox(
+                lotName: 'Lot O-1',
+                rating: 'X/296 Spaces',
+                permission: 'Employee Only until 4pm'),
+            CheckinBox(
                 lotName: 'Lot P',
                 rating: 'x/524 Spaces',
                 permission: 'Commuter'),
             CheckinBox(
-                lotName: 'Lot W',
-                rating: 'X/Y Spaces',
-                permission: 'Residential'),
-            CheckinBox(
-                lotName: 'Lot A-1',
-                rating: 'X/Y Spaces',
-                permission: 'Employee'),
+                lotName: 'Lot D',
+                rating: 'X/391 Spaces',
+                permission: 'Commuter'),
           ],
         )
     );
@@ -89,9 +89,9 @@ class Lots {
 // Holds the information for what goes into the CheckinBox for the above listView
 class CheckinBox extends StatelessWidget {
   CheckinBox({required this.lotName, required this.rating, required this.permission});
-  final String lotName;
-  final String rating;
-  final String permission;
+  String lotName;
+  String rating;
+  String permission;
 
   @override
   Widget build(BuildContext context) {
@@ -129,13 +129,13 @@ class CheckinBox extends StatelessWidget {
 
 /* Code removed from the original
 return FutureBuilder<Lots>(
-future: futureLots,
-builder: (context, snapshot) {
-if (snapshot.hasData) {
-return Text(snapshot.data!.userId.toString());
-} else {
-return Text('${snapshot.error}');
-}
-},
-);
+  future: futureLots,
+  builder: (context, snapshot) {
+    if (snapshot.hasData) {
+    return Text(snapshot.data!.userId.toString());
+      } else {
+        return Text('${snapshot.error}');
+     }
+   },
+ );
  */
