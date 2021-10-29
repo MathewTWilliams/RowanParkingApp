@@ -1,13 +1,9 @@
-import 'dart:convert';
-
 import 'lotinfo_widget.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-import 'package:http/http.dart' as http;
-
-const String serverURL = "3.137.195.9";
+import 'package:rowan_parking_app/api/lots.dart';
 
 void main() => runApp(const MaterialApp(home: LotsWidget()));
 
@@ -20,88 +16,46 @@ class LotsWidget extends StatefulWidget {
 }
 
 class LotsWidgetState extends State<LotsWidget> {
-  late Future<Lots> futureLots;
+  late Future<List<LotEntry>> futureLotEntries;
 
   @override
   void initState() {
     super.initState();
 
-    futureLots = Lots.getLots();
+    futureLotEntries = Lots.getLotEntryList();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: ListView(
-          shrinkWrap: true, padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
-          children: <Widget> [
-            CheckinBox(
-                lotName: 'Lot O',
-                permission: 'Commuter'),
-            CheckinBox(
-                lotName: 'Lot O-1',
-                permission: 'Employee Only until 4pm'),
-            CheckinBox(
-                lotName: 'Lot P',
-                permission: 'Commuter'),
-            CheckinBox(
-                lotName: 'Lot D',
-                permission: 'Commuter'),
-            CheckinBox(
-              lotName: 'Lot A',
-              permission: 'Commuter'),
-          ],
-        )
-    );
-  }
-}
-
-class Lots {
-  int venueId;
-  int id;
-  String title;
-  int spotsTaken;
-  int numSpaces;
-
-  static Future<Lots> getLots() async {
-    final response = await http.get(Uri.parse('http://3.137.195.9/api/venues/1/lots/1'));
-
-    if (response.statusCode == 200) {
-      return Lots.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Received invalid server response trying to GET Lots');
-    }
-  }
-
-  Lots({
-    required this.venueId,
-    required this.id,
-    required this.title,
-    required this.numSpaces,
-    required this.spotsTaken,
-  });
-
-  factory Lots.fromJson(Map<String, dynamic> json) {
-    return Lots(
-      venueId: json['VenueId'],
-      id: json['Id'],
-      title: json['LotName'],
-      numSpaces: json['NumSpaces'],
-      spotsTaken: json['SpotsTaken'],
-    );
+    return FutureBuilder<List<LotEntry>>(
+        future: futureLotEntries,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Scaffold(
+                body: ListView(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
+                    children: <Widget>[
+                  for (LotEntry lotEntry in snapshot.data!)
+                    CheckinBox(lotEntry: lotEntry)
+                ]));
+          } else {
+            return Text('${snapshot.error}');
+          }
+        });
   }
 }
 
 // Holds the information for what goes into the CheckinBox for the above listView
 class CheckinBox extends StatelessWidget {
-  CheckinBox({required this.lotName, required this.permission});
-  String lotName;
-  String permission;
+  CheckinBox({required this.lotEntry});
+  LotEntry lotEntry;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(8), height: 120,
+      padding: const EdgeInsets.all(8),
+      height: 120,
       child: Card(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -112,40 +66,20 @@ class CheckinBox extends StatelessWidget {
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
-                          Text(lotName, style: const TextStyle(fontWeight:
-                          FontWeight.bold)), Text(permission),
-                        ]
-                    )
-                )
-            ),
-            ElevatedButton(child: const Text('Lot Info'),
-              onPressed: (){ //Navigates to the Checkout screen
-              if(lotName == 'Lot O'){
-                Navigator.push(context,
-                  MaterialPageRoute(builder: (context)=> LotOWidget()),
+                          Text(lotEntry.lotInfo.lotName,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold)),
+                          Text(lotEntry.lotInfo.lotDescription),
+                        ]))),
+            ElevatedButton(
+              //Navigates to the Checkout screen
+              child: const Text('Lot Info'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => LotInfoWidget(lotEntry: lotEntry)),
                 );
-              }
-              if(lotName == 'Lot O-1'){
-                Navigator.push(context,
-                  MaterialPageRoute(builder: (context)=> LotO1Widget()),
-                );
-              }
-              if(lotName == 'Lot P'){
-                Navigator.push(context,
-                  MaterialPageRoute(builder: (context)=> LotPWidget()),
-                );
-              }
-              if(lotName == 'Lot D'){
-                Navigator.push(context,
-                  MaterialPageRoute(builder: (context)=> LotDWidget()),
-                );
-              }
-              if(lotName == 'Lot A'){
-                Navigator.push(context,
-                MaterialPageRoute(builder: (context)=> LotAWidget()),
-                );
-              }
-              else{ print("That lof doesn't have info yet. Sorry!");}
               },
             ),
           ],
@@ -154,6 +88,7 @@ class CheckinBox extends StatelessWidget {
     );
   }
 }
+
 
 /* Code removed from the original, it originally replaced the Scaffold() in the build Widget
 return FutureBuilder<Lots>(

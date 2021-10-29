@@ -66,8 +66,6 @@ class Profile extends StatelessWidget {
   }
 }
 
-
-
 /// -----------------------------------
 ///            Login Widget
 /// -----------------------------------
@@ -87,16 +85,15 @@ class Login extends StatelessWidget {
           'Welcome To the Rowan Parking App',
           textAlign: TextAlign.left,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontWeight: FontWeight.bold,
+          style: const TextStyle(
+              fontWeight: FontWeight.bold,
               fontSize: 25,
               color: Color(0xFFFFCC00)),
-
         ),
         RaisedButton(
           onPressed: () async {
             await loginAction();
           },
-
           child: const Text('Login'),
         ),
         Text(loginError ?? ''),
@@ -137,22 +134,18 @@ class _MyAppState extends State<MyApp> {
         home: Scaffold(
           appBar: AppBar(
             title: const Text('Rowan Parking App'),
-            //backgroundColor: Color(0xFFFFCC00),
           ),
           body: Center(
             child: Container(
               alignment: Alignment.center,
-              //color: Color(0xFF57150B),
-
               child: isBusy
                   ? const CircularProgressIndicator()
                   : isLoggedIn
-                  ? NavWidget()//Profile(logoutAction, name, picture)
-                  : Login(loginAction, errorMessage),
+                      ? NavWidget() //Profile(logoutAction, name, picture)
+                      : Login(loginAction, errorMessage),
             ),
           ),
-        )
-    );
+        ));
   }
 
   Map<String, Object> parseIdToken(String idToken) {
@@ -185,7 +178,7 @@ class _MyAppState extends State<MyApp> {
 
     try {
       final AuthorizationTokenResponse result =
-      await appAuth.authorizeAndExchangeCode(
+          await appAuth.authorizeAndExchangeCode(
         AuthorizationTokenRequest(
           AUTH0_CLIENT_ID,
           AUTH0_REDIRECT_URI,
@@ -197,7 +190,7 @@ class _MyAppState extends State<MyApp> {
 
       final Map<String, Object> idToken = parseIdToken(result.idToken);
       final Map<String, Object> profile =
-      await getUserDetails(result.accessToken);
+          await getUserDetails(result.accessToken);
 
       await secureStorage.write(
           key: 'refresh_token', value: result.refreshToken);
@@ -235,7 +228,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> initAction() async {
     final String storedRefreshToken =
-    await secureStorage.read(key: 'refresh_token');
+        await secureStorage.read(key: 'refresh_token');
     if (storedRefreshToken == null) return;
 
     setState(() {
@@ -252,7 +245,7 @@ class _MyAppState extends State<MyApp> {
 
       final Map<String, Object> idToken = parseIdToken(response.idToken);
       final Map<String, Object> profile =
-      await getUserDetails(response.accessToken);
+          await getUserDetails(response.accessToken);
 
       await secureStorage.write(
           key: 'refresh_token', value: response.refreshToken);
@@ -270,13 +263,14 @@ class _MyAppState extends State<MyApp> {
   }
 
   static ThemeData appTheme = ThemeData(
-    appBarTheme: AppBarTheme(backgroundColor: Color(0xFFFFCC00)), 
-    canvasColor: Color(0xFF57150B) , 
-    cardTheme: CardTheme(color: Colors.grey[700]),  // Button background
-    textTheme: TextTheme(bodyText1: TextStyle(color: Colors.white), // Nav drawer labels
-                          bodyText2: TextStyle(color: Colors.white)), // Text on cards
-    buttonTheme: ButtonThemeData(buttonColor: Colors.amber[700]),
-    elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(primary: Colors.amber[700]))
+    appBarTheme: AppBarTheme(backgroundColor: Color(0xFFFFCC00)),
+    canvasColor: Color(0xFF57150B),
+    cardTheme: CardTheme(color: Colors.grey[700]), // Button background
+    textTheme: TextTheme(
+        bodyText1: TextStyle(color: Colors.white), // Nav drawer labels
+        bodyText2: TextStyle(color: Colors.white)), // Text on cards
+    buttonTheme: ButtonThemeData(buttonColor: Colors.brown[700]),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(primary: Colors.brown[700])),
   );
 }
-
