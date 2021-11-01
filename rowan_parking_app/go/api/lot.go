@@ -1,48 +1,15 @@
-//Author: Matt Williams
-//Version: 10/19/2021
-
 package api
 
 import (
-	"RPA/backend/models"
 	"net/http"
+	"RPA/backend/models"
 
 	"github.com/gin-gonic/gin"
 )
 
-func (api *API) GetVenues(c *gin.Context) {
-	var venues []models.Venue
-	var err error
-	venues, err = api.ds.SelectVenues(nil, nil)
-
-	if err != nil {
-
-		c.IndentedJSON(http.StatusInternalServerError, err)
-	} else if venues == nil {
-
-		c.IndentedJSON(http.StatusNoContent, []models.Venue{})
-	}
-	c.IndentedJSON(http.StatusOK, venues)
-
-}
-
-func (api *API) GetVenueById(c *gin.Context) {
-	var queryResult []models.Venue
-	var err error
-
-	vid := c.Param("vid")
-	var conditions []string
-	conditions = append(conditions, "Where Id = "+vid)
-	queryResult, err = api.ds.SelectVenues(nil, conditions)
-
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, err)
-	} else if len(queryResult) == 0 || len(queryResult) > 1 {
-		c.IndentedJSON(http.StatusNoContent, []models.Venue{})
-	} else {
-		c.IndentedJSON(http.StatusOK, queryResult[0])
-	}
-
+func (api *API) RouteLots() {
+	api.router.GET("/api/venues/:vid/lots", api.GetLotsFromVenue)
+	api.router.GET("/api/venues/:vid/lots/:lid", api.GetLotFromVenue)
 }
 
 func (api *API) GetLotsFromVenue(c *gin.Context) {
