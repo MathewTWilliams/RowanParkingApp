@@ -28,3 +28,9 @@ type PostCheckInResponse struct {
 	SpotsTaken  int64        `json:"SpotsTaken"`
 	CheckInInfo Lot_Check_in `json:"CheckInInfo"`
 }
+
+type PostVenuePayload struct {
+	VenueName string  `json:"VenueName"`
+	Latitude  float64 `json:"Latitude"`
+	Longitude float64 `json:"Longitude"`
+}

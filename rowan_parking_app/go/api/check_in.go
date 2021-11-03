@@ -1,10 +1,10 @@
 package api
 
 import (
+	"RPA/backend/models"
 	"net/http"
 	"strconv"
 	"time"
-	"RPA/backend/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -35,15 +35,7 @@ func (api *API) PostCheckIn(c *gin.Context) {
 		return
 	}
 
-	/*venues, err := api.ds.SelectVenues(nil, []string{"Where Id = " + strconv.FormatInt(vid, 10)})
-	if err != nil || len(venues) == 0 || len(venues) > 1 {
-		c.IndentedJSON(http.StatusInternalServerError, err)
-		return
-	}*/
-
-	//loc, _ := time.LoadLocation(api.ds.GetVenueTimeZone(venues[0].GetPoint()))
-
-	checkInTime := time.Now() //.In(loc)
+	checkInTime := time.Now()
 	var checkInResponse models.PostCheckInResponse
 	checkInResponse.CheckInInfo.LotId = lid
 	checkInResponse.CheckInInfo.CheckInTime = checkInTime

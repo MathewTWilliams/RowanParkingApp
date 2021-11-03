@@ -1,8 +1,8 @@
 package api
 
 import (
-	"net/http"
 	"RPA/backend/models"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,4 +41,20 @@ func (api *API) GetVenueById(c *gin.Context) {
 	} else {
 		c.IndentedJSON(http.StatusOK, queryResult[0])
 	}
+}
+
+func (api *API) PostVenue(c *gin.Context) {
+	var payload models.PostVenuePayload
+
+	err := c.BindJSON(&payload)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	var newVenue models.Venue
+	newVenue.VenueName = payload.VenueName
+	newVenue.SetVenueLocation_Coords(payload.Latitude, payload.Longitude)
+
 }

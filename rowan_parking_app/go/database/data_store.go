@@ -47,20 +47,12 @@ func (ds *DataStore) InitDB() {
 	fmt.Println("Connected!")
 }
 
-/*func (ds *DataStore) GetVenueTimeZone(point *geom.Point) string {
-	points := point.FlatCoords()
-	lat := points[0]
-	long := points[1]
-
-
-
-}*/
-
 //Given a check in time and check out time, determine if a spot is being occupied.
-//A spot is being occupied if: the check in date matches the time_now date (after timezone conversion),
-//and if the check_out time is nil
 func (ds *DataStore) IsOccupyingSpot(check_in time.Time, check_out time.Time) bool {
 
+	if check_out.After(check_in) {
+		return false
+	}
 	time_now := time.Now().In(check_in.Location())
 	if check_in.Year() == time_now.Year() &&
 		check_in.Month() == time_now.Month() &&
@@ -160,4 +152,45 @@ func (ds *DataStore) UpdateValues(table string, columns_and_values []string, con
 
 	_, err := ds.DB.Exec(query.String())
 	return err
+}
+
+func (ds *DataStore) InsertQueryBuilder(table string, cols []string) string {
+
+	var query strings.Builder
+	query.WriteString("Insert Into " + table + " (")
+	ds.AppendValuesToQuery(&query, cols, ", ", ") ")
+	query.WriteString("Values (")
+
+	for index := 0; index < len(cols); index++ {
+		if index+1 < len(cols) {
+			query.WriteString("?, ")
+		} else {
+			query.WriteString("?)")
+		}
+	}
+
+	query.WriteString(";")
+	return query.String()
+
+}
+
+func (ds *DataStore) SelectQueryBuilder(table string,
+	cols []string, conditions []string) string {
+
+	var query strings.Builder
+	query.WriteString("Select ")
+	if len(cols) == 0 {
+		query.WriteString("* ")
+	} else {
+		ds.AppendValuesToQuery(&query, cols, ", ", " ")
+	}
+
+	query.WriteString("from " + table + " ")
+
+	if len(conditions) > 0 {
+		ds.AppendValuesToQuery(&query, conditions, " ", "")
+	}
+
+	query.WriteString(";")
+	return query.String()
 }
