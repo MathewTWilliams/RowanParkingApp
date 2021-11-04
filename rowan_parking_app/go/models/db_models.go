@@ -5,8 +5,6 @@ package models
 
 import (
 	"time"
-
-	"github.com/twpayne/go-geom/encoding/geojson"
 )
 
 type SettingsJson struct {
@@ -14,28 +12,11 @@ type SettingsJson struct {
 	Language string `json:"Language"`
 }
 
-type Venue struct {
-	Id            int64             `json:"Id"`
-	VenueName     string            `json:"VenueName"`
-	VenueLocation *geojson.Geometry `json:"VenueLocation"`
-}
-
 type Lot_Type struct {
 	Id       int64  `json:"Id"`
 	TypeName string `json:"TypeName"`
 	Rules    string `json:"Rules"`
-}
-
-type Lot struct {
-	Id             int64             `json:"Id"`
-	LotName        string            `json:"LotName"`
-	LotDescription string            `json:"LotDescription"`
-	LotType        int64             `json:"LotType"`
-	NumSpaces      int64             `json:"NumSpaces"`
-	VenueId        int64             `json:"VenueId"`
-	SpecificRules  string            `json:"SpecificRules"`
-	BoundingBox    *geojson.Geometry `json:"BoundingBox"`
-	LotLocation    *geojson.Geometry `json:"LotLocation"`
+	VenueId  int64  `json:"VenueId"`
 }
 
 type Lot_Check_in struct {

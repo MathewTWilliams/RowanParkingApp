@@ -5,10 +5,6 @@ import (
 	"RPA/backend/models"
 	"database/sql"
 	"fmt"
-
-	geom "github.com/twpayne/go-geom"
-	"github.com/twpayne/go-geom/encoding/geojson"
-	"github.com/twpayne/go-geom/encoding/wkb"
 )
 
 func (ds *DataStore) SelectLots(columns []string, conditions []string) ([]models.Lot, error) {
@@ -35,22 +31,12 @@ func (ds *DataStore) SelectLots(columns []string, conditions []string) ([]models
 			return nil, fmt.Errorf("GetLots: %v", err)
 		}
 
-		//need to ignore the first 4 bytes added by MySQL
-		bb, err := wkb.Unmarshal(tempBB[constants.SRID_BYTE_OFFSET:])
-		if err != nil {
-			return nil, fmt.Errorf(("GetVenues: %v"), err)
-		}
-
-		ll, err := wkb.Unmarshal(tempLL[constants.SRID_BYTE_OFFSET:])
+		err = lot.SetBoundingBox_Bytes(tempBB)
 		if err != nil {
 			return nil, fmt.Errorf("GetLots: %v", err)
 		}
 
-		lot.BoundingBox, err = geojson.Encode(bb.(*geom.Polygon).SetSRID(constants.SRID))
-		if err != nil {
-			return nil, fmt.Errorf("GetLots: %v", err)
-		}
-		lot.LotLocation, err = geojson.Encode(ll.(*geom.Point).SetSRID(constants.SRID))
+		err = lot.SetLotLocation_Bytes(tempLL)
 		if err != nil {
 			return nil, fmt.Errorf("GetLots: %v", err)
 		}
