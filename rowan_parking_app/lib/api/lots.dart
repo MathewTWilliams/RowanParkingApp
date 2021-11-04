@@ -1,14 +1,21 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
+
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const String serverURL = "3.137.195.9";
 
+const FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
 class Lots
 {
   static Future<List<LotEntry>> getLotEntryList() async {
+    final String accessToken = await secureStorage.read(key: 'access_token');
+    print("READ ACCESS TOKEN: ${accessToken}");
     final response =
-        await http.get(Uri.parse('http://3.137.195.9/api/venues/1/lots'));
+        await http.get(Uri.parse('http://3.137.195.9/api/venues/1/lots'), 
+        headers: {HttpHeaders.authorizationHeader: "Basic $accessToken"});
 
     if (response.statusCode == 200) {
       print(response.body);

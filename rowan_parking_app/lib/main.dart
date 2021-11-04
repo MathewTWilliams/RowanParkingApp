@@ -125,6 +125,7 @@ class _MyAppState extends State<MyApp> {
   String errorMessage;
   String name;
   String picture;
+  String accessToken;
 
   @override
   Widget build(BuildContext context) {
@@ -194,6 +195,10 @@ class _MyAppState extends State<MyApp> {
 
       await secureStorage.write(
           key: 'refresh_token', value: result.refreshToken);
+
+      print("WRITING ACCESS TOKEN: ${result.accessToken}");
+      await secureStorage.write(
+          key: 'access_token', value: result.accessToken);
 
       setState(() {
         isBusy = false;
