@@ -34,3 +34,8 @@ type PostVenuePayload struct {
 	Latitude  float64 `json:"Latitude"`
 	Longitude float64 `json:"Longitude"`
 }
+
+type PostLotTypePayload struct {
+	TypeName string `json:"TypeName"`
+	Rules    string `json:"Rules"`
+}
