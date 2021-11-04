@@ -35,3 +35,28 @@ func (ds *DataStore) SelectVenues(columns []string, conditions []string) ([]mode
 	return venues, nil
 
 }
+
+func (ds *DataStore) InsertVenue(venue models.Venue) (int64, error) {
+	var err error
+	cols := []string{"Id", "VenueName", "VenueLocation"}
+
+	geom_point_bytes, err := venue.GetVenueLocation_Bytes()
+	if err != nil {
+		return -1, fmt.Errorf("InsertVenue: %v", err)
+	}
+
+	query := ds.InsertQueryBuilder(constants.TABLENAME_VENUES, cols)
+	result, err := ds.Exec(query, venue.Id, venue.VenueName, geom_point_bytes)
+
+	if err != nil {
+		return -1, fmt.Errorf("InsertVenue: %v", err)
+	}
+
+	v_id, err := result.LastInsertId()
+	if err != nil {
+		return -1, fmt.Errorf("InsertVenue: %v", err)
+	}
+
+	return v_id, nil
+
+}

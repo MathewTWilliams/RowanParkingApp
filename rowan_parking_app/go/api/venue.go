@@ -19,8 +19,10 @@ func (api *API) GetVenues(c *gin.Context) {
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
 	} else if venues == nil {
 		c.IndentedJSON(http.StatusNoContent, []models.Venue{})
+		return
 	}
 	c.IndentedJSON(http.StatusOK, venues)
 }
@@ -57,4 +59,12 @@ func (api *API) PostVenue(c *gin.Context) {
 	newVenue.VenueName = payload.VenueName
 	newVenue.SetVenueLocation_Coords(payload.Latitude, payload.Longitude)
 
+	v_id, err := api.ds.InsertVenue(newVenue)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	newVenue.Id = v_id
+	c.IndentedJSON(http.StatusCreated, newVenue)
 }
