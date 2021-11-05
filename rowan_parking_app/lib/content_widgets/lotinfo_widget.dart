@@ -87,6 +87,7 @@ class CheckoutWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    try{
     return Scaffold(
         appBar: AppBar(title: const Text("Ready to Check-Out?")),
         body: ListView(
@@ -104,6 +105,16 @@ class CheckoutWidget extends StatelessWidget {
             ),
           ],
         ));
+    }catch(e){
+      return Scaffold(
+          appBar: AppBar(
+              title: Text("${lotEntry.lotInfo.lotName} Information Error")),
+          body: Center(
+              child: SizedBox(width: 200, height: 200, child: CircularProgressIndicator())
+        )
+
+      );
+    }
   }
 }
 
