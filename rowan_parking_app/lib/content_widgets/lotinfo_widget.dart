@@ -10,32 +10,43 @@ class LotInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: Text("${lotEntry.lotInfo.lotName} Information")),
-        body: ListView(
-          shrinkWrap: true,
-          padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
-          children: <Widget>[
-            LotInfoBox(
-                rating: 'Good Availability',
-                spaces:
-                    '${lotEntry.lotInfo.numSpaces - lotEntry.spotsTaken}/${lotEntry.lotInfo.numSpaces} Spaces',
-                permission: '${lotEntry.lotInfo.specificRules}'),
-            ElevatedButton(
-              child: const Text('Check-in'),
-              onPressed: () {
-                //Navigates to the Checkout screen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => CheckoutWidget(
-                            nameLot: lotEntry.lotInfo.lotName,
-                          )),
-                );
-              },
-            ),
-          ],
-        ));
+    try{
+      return Scaffold(
+          appBar: AppBar(title: Text("${lotEntry.lotInfo.lotName} Information")),
+            body: ListView(
+            shrinkWrap: true,
+            padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
+            children: <Widget>[
+              LotInfoBox(
+                  rating: 'Good Availability',
+                  spaces:
+                      '${lotEntry.lotInfo.numSpaces - lotEntry.spotsTaken}/${lotEntry.lotInfo.numSpaces} Spaces',
+                  permission: '${lotEntry.lotInfo.specificRules}'),
+              ElevatedButton(
+                child: const Text('Check-in'),
+                onPressed: () {
+                  //Navigates to the Checkout screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CheckoutWidget(
+                              nameLot: lotEntry.lotInfo.lotName,
+                            )),
+                  );
+                },
+              ),
+            ],
+          ));
+    }catch(e){
+      return Scaffold(
+          appBar: AppBar(
+              title: Text("${lotEntry.lotInfo.lotName} Information Error")),
+          body: Center(
+              child: SizedBox(width: 200, height: 200, child: CircularProgressIndicator())
+        )
+
+      );
+    }
   }
 }
 
