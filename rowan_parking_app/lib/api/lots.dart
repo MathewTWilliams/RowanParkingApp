@@ -8,14 +8,13 @@ const String serverURL = "3.137.195.9";
 
 const FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
-class Lots
-{
+class Lots {
   static Future<List<LotEntry>> getLotEntryList() async {
     final String accessToken = await secureStorage.read(key: 'access_token');
     print("READ ACCESS TOKEN: ${accessToken}");
-    final response =
-        await http.get(Uri.parse('http://3.137.195.9/api/venues/1/lots'), 
-        headers: {HttpHeaders.authorizationHeader: "Basic $accessToken"});
+    final response = await http.get(
+        Uri.parse('http://3.137.195.9/api/venues/1/lots'),
+        headers: {'authorization': 'Basic $accessToken'});
 
     if (response.statusCode == 200) {
       print(response.body);
@@ -40,7 +39,8 @@ class LotEntry {
         lotInfo: LotInfo.fromJson(json["LotInfo"]),
       );
 
-  static List<LotEntry> entryListFromJson(String str) => List<LotEntry>.from(json.decode(str).map((x) => LotEntry.fromJson(x)));
+  static List<LotEntry> entryListFromJson(String str) =>
+      List<LotEntry>.from(json.decode(str).map((x) => LotEntry.fromJson(x)));
 }
 
 class LotInfo {
