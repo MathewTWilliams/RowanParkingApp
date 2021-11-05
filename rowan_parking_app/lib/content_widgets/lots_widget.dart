@@ -39,9 +39,14 @@ class LotsWidgetState extends State<LotsWidget> {
                   for (LotEntry lotEntry in snapshot.data!)
                     CheckinBox(lotEntry: lotEntry)
                 ]));
-          } else {
+          } else if (snapshot.hasError){
             return Text('${snapshot.error}');
           }
+            return Scaffold( //Loading screen while gathering information
+              body: Center(
+                  child: SizedBox(width: 200, height: 200, child: CircularProgressIndicator())
+              )
+          );
         });
   }
 }
