@@ -1,14 +1,15 @@
 package api
 
 import (
-	"net/http"
 	"RPA/backend/models"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (api *API) RouteBugs() {
 	api.router.POST("/api/users/report_bug", api.PostBugReport)
+	api.router.GET("/api/bug_reports", api.GetBugReports)
 }
 
 func (api *API) PostBugReport(c *gin.Context) {
@@ -34,4 +35,17 @@ func (api *API) PostBugReport(c *gin.Context) {
 
 	newBugReport.Id = b_id
 	c.IndentedJSON(http.StatusCreated, newBugReport)
+}
+
+func (api *API) GetBugReports(c *gin.Context) {
+	var bugs []models.Bug
+	var err error
+
+	bugs, err = api.ds.SelectBugs(nil, nil)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.IndentedJSON(api.GetStatusForContent(len(bugs)), bugs)
 }

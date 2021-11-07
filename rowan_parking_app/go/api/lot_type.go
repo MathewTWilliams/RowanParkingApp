@@ -9,26 +9,28 @@ import (
 )
 
 func (api *API) RouteLotTypes() {
-	api.router.GET("api/venues/:vid/lot_types", api.GetLotTypesForVenue)
+	api.router.GET("api/venues/:vid/lot_types", api.GetLotTypes)
+	api.router.GET("api/lot_types", api.GetLotTypes)
 	api.router.POST("api/venues/:vid/post_lot_type", api.PostLotType)
 }
 
-func (api *API) GetLotTypesForVenue(c *gin.Context) {
+func (api *API) GetLotTypes(c *gin.Context) {
 	var types []models.Lot_Type
 	var err error
+	var conditions []string
 
 	v_id := c.Param("vid")
-	conditions := []string{"Where VenueId = " + v_id}
+	if v_id != "" {
+		conditions = append(conditions, "Where VenueId = "+v_id)
+	}
 
 	types, err = api.ds.SelectLotTypes(nil, conditions)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 		return
-	} else if types == nil {
-		c.IndentedJSON(http.StatusNoContent, []models.Lot_Type{})
-		return
 	}
-	c.IndentedJSON(http.StatusOK, types)
+
+	c.IndentedJSON(api.GetStatusForContent(len(types)), types)
 
 }
 

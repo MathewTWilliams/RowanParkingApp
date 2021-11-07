@@ -1,16 +1,50 @@
 package api
 
 import (
+	"RPA/backend/models"
 	"net/http"
 	"strconv"
 	"time"
-	"RPA/backend/models"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (api *API) RouteRatings() {
 	api.router.POST("/api/venues/:vid/lots/:lid/rating", api.PostLotRating)
+	api.router.GET("/api/lot_ratings", api.GetLotRatings)
+	api.router.GET("/api/venues/:vid/lot_ratings", api.GetLotRatings_Specific)
+	api.router.GET("api/venues/:vid/lots/:lid/lot_ratings", api.GetLotRatings_Specific)
+}
+
+func (api *API) GetLotRatings(c *gin.Context) {
+	var err error
+	var ratings []models.Lot_Rating
+
+	ratings, err = api.ds.SelectLotRatings(nil, nil)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.IndentedJSON(api.GetStatusForContent(len(ratings)), ratings)
+}
+
+func (api *API) GetLotRatings_Specific(c *gin.Context) {
+	var ratings []models.Lot_Rating
+	var err error
+
+	l_id := c.Param("lid")
+	v_id := c.Param("vid")
+
+	ratings, err = api.ds.SelectLotRatings_Specific(v_id, l_id)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	c.IndentedJSON(api.GetStatusForContent(len(ratings)), ratings)
+
 }
 
 func (api *API) PostLotRating(c *gin.Context) {
@@ -41,12 +75,10 @@ func (api *API) PostLotRating(c *gin.Context) {
 		return
 	}
 
-	//loc, _ := time.LoadLocation(api.ds.GetVenueTimeZone(venues[0].GetPoint()))
-
 	var newLotRating models.Lot_Rating
 	newLotRating.LotId = lid
 	newLotRating.Review = payload.Review
-	newLotRating.TimeOfReview = time.Now() //.In(loc)
+	newLotRating.TimeOfReview = time.Now()
 	newLotRating.UserId = payload.UserId
 
 	lr_id, err := api.ds.InsertLotRating(newLotRating)

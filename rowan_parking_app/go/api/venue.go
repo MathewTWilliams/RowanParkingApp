@@ -20,11 +20,8 @@ func (api *API) GetVenues(c *gin.Context) {
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 		return
-	} else if venues == nil {
-		c.IndentedJSON(http.StatusNoContent, []models.Venue{})
-		return
 	}
-	c.IndentedJSON(http.StatusOK, venues)
+	c.IndentedJSON(api.GetStatusForContent(len(venues)), venues)
 }
 
 func (api *API) GetVenueById(c *gin.Context) {
