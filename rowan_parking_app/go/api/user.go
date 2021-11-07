@@ -1,11 +1,11 @@
 package api
 
 import (
-	"net/http"
-	"strconv"
-	"log"
 	"RPA/backend/constants"
 	"RPA/backend/models"
+	"log"
+	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +14,27 @@ func (api *API) RouteUsers() {
 	api.router.POST("/api/users/login", api.TryPostUser)
 }
 
+func (api *API) GetUsers(c *gin.Context) {
+	var users []models.User
+	var err error
+	var conditions []string
+
+	v_id := c.Param("vid")
+
+	if v_id != "" {
+		conditions = append(conditions, "Where Venueid = "+v_id)
+	}
+
+	users, err = api.ds.SelectUsers(nil, conditions)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.IndentedJSON(api.GetStatusForContent(len(users)), users)
+}
+
+//change to get request
 func (api *API) TryPostUser(c *gin.Context) {
 	var err error
 	var payload models.RegisterUserPayload
