@@ -12,6 +12,8 @@ import (
 
 func (api *API) RouteUsers() {
 	api.router.POST("/api/users/login", api.TryPostUser)
+	api.router.GET("/api/users", api.GetUsers)
+	api.router.GET("/api/venues/:vid/users", api.GetUsers)
 }
 
 func (api *API) GetUsers(c *gin.Context) {
