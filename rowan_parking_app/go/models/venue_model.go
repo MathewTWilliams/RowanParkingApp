@@ -15,6 +15,7 @@ type Venue struct {
 	Id            int64             `json:"Id"`
 	VenueName     string            `json:"VenueName"`
 	VenueLocation *geojson.Geometry `json:"VenueLocation"`
+	Timezone      string            `json:"Timezone"`
 }
 
 func (v *Venue) SetVenueLocation_Bytes(bytes []byte) error {

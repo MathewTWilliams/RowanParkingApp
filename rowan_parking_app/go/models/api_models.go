@@ -33,6 +33,7 @@ type PostVenuePayload struct {
 	VenueName string  `json:"VenueName"`
 	Latitude  float64 `json:"Latitude"`
 	Longitude float64 `json:"Longitude"`
+	Timezone  string  `json:"Timezone"`
 }
 
 type PostLotTypePayload struct {
