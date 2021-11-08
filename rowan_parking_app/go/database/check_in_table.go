@@ -7,14 +7,15 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 )
 
-func (ds *DataStore) SelectLotCheckIns(columns []string, conditions []string) ([]models.Lot_Check_in, error) {
+func (ds *DataStore) SelectLotCheckIns(conditions []string) ([]models.Lot_Check_in, error) {
 	var check_ins []models.Lot_Check_in
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_LCI, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_LCI, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("SelectLotCheckIns: %v", err)
@@ -58,11 +59,17 @@ func (ds *DataStore) InsertCheckIn(checkIn models.Lot_Check_in) (int64, error) {
 	cols_vals := []string{"LastCheckIn = " + strconv.FormatInt(id, 10)}
 	conds := []string{"Where Id = " + strconv.FormatInt(checkIn.UserId, 10)}
 
-	err = ds.UpdateValues(constants.TABLENAME_USERS, cols_vals, conds)
+	query = ds.UpdateValuesBuilder(constants.TABLENAME_USERS, cols_vals, conds)
+
+	result, err = ds.Exec(query)
 	if err != nil {
 		return -1, fmt.Errorf("InsertCheckIn: %v", err)
 	}
 
+	_, err = result.LastInsertId()
+	if err != nil {
+		return -1, fmt.Errorf("InsertCheckIn: %v", err)
+	}
 	return id, nil
 
 }
@@ -106,5 +113,28 @@ func (ds *DataStore) SelectLotCheckIns_Specific(v_id string, l_id string) ([]mod
 	}
 
 	return check_ins, nil
+
+}
+
+func (ds *DataStore) InsertCheckOut(check_out_time time.Time, u_id string, l_id string) (int64, error) {
+	var err error
+
+	col_vals := []string{"CheckOutTime = ? "}
+	conds := []string{"Where UserId = " + u_id,
+		"And LotId = " + l_id,
+		"And CheckOutTime is Null"}
+
+	query := ds.UpdateValuesBuilder(constants.TABLENAME_LCI, col_vals, conds)
+	result, err := ds.Exec(query, check_out_time)
+	if err != nil {
+		return -1, fmt.Errorf("InsertCheckOut: %v", err)
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return -1, fmt.Errorf("InsertCheckOut: %v", err)
+	}
+
+	return id, nil
 
 }

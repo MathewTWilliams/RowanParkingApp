@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -48,9 +47,9 @@ func (ds *DataStore) InitDB() {
 }
 
 //Given a check in time and check out time, determine if a spot is being occupied.
-func (ds *DataStore) IsOccupyingSpot(check_in time.Time, check_out time.Time) bool {
+func (ds *DataStore) IsOccupyingSpot(check_in time.Time, check_out sql.NullTime) bool {
 
-	if check_out.After(check_in) {
+	if check_out.Valid && check_out.Time.After(check_in) {
 		return false
 	}
 	time_now := time.Now().In(check_in.Location())
@@ -63,20 +62,17 @@ func (ds *DataStore) IsOccupyingSpot(check_in time.Time, check_out time.Time) bo
 	return false
 }
 
-func (ds *DataStore) CountSpotsTaken(vid int64, lid int64) (int64, error) {
+func (ds *DataStore) CountSpotsTaken(v_id string, l_id string) (int64, error) {
 	var err error
 	var rows *sql.Rows
 	var count int64
 
-	vid_str := strconv.FormatInt(vid, 10)
-	lid_str := strconv.FormatInt(lid, 10)
-
 	//building the query from the inside out
-	q := "(Select LastCheckIn From Users Where Users.VenueId = " + vid_str
+	q := "(Select LastCheckIn From Users Where Users.VenueId = " + v_id
 	q += " And Users.LastCheckIn Is Not Null) As Q1"
 	q = "(Lot_Check_ins inner join" + q + " On Lot_Check_ins.Id = Q1.LastCheckIn) "
 	q = "Select CheckInTime,CheckOutTime from " + q
-	q += "Where Lot_Check_ins.LotId = " + lid_str + ";"
+	q += "Where Lot_Check_ins.LotId = " + l_id + ";"
 
 	rows, err = ds.DB.Query(q)
 
@@ -96,7 +92,7 @@ func (ds *DataStore) CountSpotsTaken(vid int64, lid int64) (int64, error) {
 			return -1, fmt.Errorf("CountSpotsTaken: %v", err)
 		}
 
-		if check_out_null.Valid && ds.IsOccupyingSpot(check_in, check_out_null.Time) {
+		if ds.IsOccupyingSpot(check_in, check_out_null) {
 			count += 1
 		}
 	}
@@ -139,7 +135,7 @@ func (ds *DataStore) AppendValuesToQuery(query *strings.Builder, values []string
 	}
 }
 
-func (ds *DataStore) UpdateValues(table string, columns_and_values []string, conds []string) error {
+func (ds *DataStore) UpdateValuesBuilder(table string, columns_and_values []string, conds []string) string {
 
 	var query strings.Builder
 	query.WriteString("Update " + table + " Set ")
@@ -150,8 +146,7 @@ func (ds *DataStore) UpdateValues(table string, columns_and_values []string, con
 
 	query.WriteString(";")
 
-	_, err := ds.DB.Exec(query.String())
-	return err
+	return query.String()
 }
 
 func (ds *DataStore) InsertQueryBuilder(table string, cols []string) string {
@@ -174,18 +169,10 @@ func (ds *DataStore) InsertQueryBuilder(table string, cols []string) string {
 
 }
 
-func (ds *DataStore) SelectQueryBuilder(table string,
-	cols []string, conditions []string) string {
+func (ds *DataStore) SelectQueryBuilder(table string, conditions []string) string {
 
 	var query strings.Builder
-	query.WriteString("Select ")
-	if len(cols) == 0 {
-		query.WriteString("* ")
-	} else {
-		ds.AppendValuesToQuery(&query, cols, ", ", " ")
-	}
-
-	query.WriteString("from " + table + " ")
+	query.WriteString("Select * from " + table + " ")
 
 	if len(conditions) > 0 {
 		ds.AppendValuesToQuery(&query, conditions, " ", "")

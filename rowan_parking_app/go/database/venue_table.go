@@ -7,12 +7,12 @@ import (
 	"fmt"
 )
 
-func (ds *DataStore) SelectVenues(columns []string, conditions []string) ([]models.Venue, error) {
+func (ds *DataStore) SelectVenues(conditions []string) ([]models.Venue, error) {
 	var venues []models.Venue
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_VENUES, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_VENUES, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("get venues: %v", err)
@@ -23,7 +23,7 @@ func (ds *DataStore) SelectVenues(columns []string, conditions []string) ([]mode
 	for rows.Next() {
 		var venue models.Venue
 		var temp []byte
-		err = rows.Scan(&venue.Id, &venue.VenueName, &temp)
+		err = rows.Scan(&venue.Id, &venue.VenueName, &temp, &venue.Timezone)
 		if err != nil {
 			return nil, fmt.Errorf("GetVenues: %v", err)
 		}
@@ -38,7 +38,7 @@ func (ds *DataStore) SelectVenues(columns []string, conditions []string) ([]mode
 
 func (ds *DataStore) InsertVenue(venue models.Venue) (int64, error) {
 	var err error
-	cols := []string{"Id", "VenueName", "VenueLocation"}
+	cols := []string{"Id", "VenueName", "VenueLocation", "Timezone"}
 
 	geom_point_bytes, err := venue.GetVenueLocation_Bytes()
 	if err != nil {
@@ -46,7 +46,7 @@ func (ds *DataStore) InsertVenue(venue models.Venue) (int64, error) {
 	}
 
 	query := ds.InsertQueryBuilder(constants.TABLENAME_VENUES, cols)
-	result, err := ds.Exec(query, venue.Id, venue.VenueName, geom_point_bytes)
+	result, err := ds.Exec(query, venue.Id, venue.VenueName, geom_point_bytes, venue.Timezone)
 
 	if err != nil {
 		return -1, fmt.Errorf("InsertVenue: %v", err)

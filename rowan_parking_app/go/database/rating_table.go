@@ -8,12 +8,12 @@ import (
 	"strings"
 )
 
-func (ds *DataStore) SelectLotRatings(columns []string, conditions []string) ([]models.Lot_Rating, error) {
+func (ds *DataStore) SelectLotRatings(conditions []string) ([]models.Lot_Rating, error) {
 	var ratings []models.Lot_Rating
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_LR, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_LR, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("GetLotRatings: %v", err)

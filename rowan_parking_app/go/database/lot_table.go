@@ -7,12 +7,12 @@ import (
 	"fmt"
 )
 
-func (ds *DataStore) SelectLots(columns []string, conditions []string) ([]models.Lot, error) {
+func (ds *DataStore) SelectLots(conditions []string) ([]models.Lot, error) {
 	var lots []models.Lot
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_LOTS, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_LOTS, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("GetLots: %v", err)

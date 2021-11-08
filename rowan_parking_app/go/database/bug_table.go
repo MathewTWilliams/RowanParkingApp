@@ -7,12 +7,12 @@ import (
 	"fmt"
 )
 
-func (ds *DataStore) SelectBugs(columns []string, conditions []string) ([]models.Bug, error) {
+func (ds *DataStore) SelectBugs(conditions []string) ([]models.Bug, error) {
 	var bugs []models.Bug
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_BUGS, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_BUGS, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("GetBugs: %v", err)

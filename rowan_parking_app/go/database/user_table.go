@@ -8,12 +8,12 @@ import (
 	"fmt"
 )
 
-func (ds *DataStore) SelectUsers(columns []string, conditions []string) ([]models.User, error) {
+func (ds *DataStore) SelectUsers(conditions []string) ([]models.User, error) {
 	var users []models.User
 	var err error
 	var rows *sql.Rows
 
-	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_USERS, columns, conditions))
+	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_USERS, conditions))
 
 	if err != nil {
 		return nil, fmt.Errorf("GetUsers: %v", err)
