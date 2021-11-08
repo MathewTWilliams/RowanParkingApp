@@ -1,8 +1,9 @@
 package api
 
 import (
-	"net/http"
 	"RPA/backend/models"
+	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,7 +22,7 @@ func (api *API) GetLotsFromVenue(c *gin.Context) {
 	var conditions []string
 	conditions = append(conditions, "Where VenueId = "+vid)
 
-	lots, err = api.ds.SelectLots(nil, conditions)
+	lots, err = api.ds.SelectLots(conditions)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 	} else if len(lots) == 0 {
@@ -29,7 +30,7 @@ func (api *API) GetLotsFromVenue(c *gin.Context) {
 	} else {
 		var responses []models.GetLotResponse
 		for _, lot := range lots {
-			spots, err := api.ds.CountSpotsTaken(lot.VenueId, lot.Id)
+			spots, err := api.ds.CountSpotsTaken(vid, strconv.FormatInt(lot.Id, 10))
 			if err != nil {
 				c.IndentedJSON(http.StatusInternalServerError, err)
 				return
@@ -53,14 +54,14 @@ func (api *API) GetLotFromVenue(c *gin.Context) {
 	conditions = append(conditions, "Where VenueID = "+vid)
 	conditions = append(conditions, " AND Id = "+lid)
 
-	queryResult, err = api.ds.SelectLots(nil, conditions)
+	queryResult, err = api.ds.SelectLots(conditions)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 	} else if len(queryResult) == 0 || len(queryResult) > 1 {
 		c.IndentedJSON(http.StatusNoContent, models.Lot{})
 	} else {
 		lot := queryResult[0]
-		spots, err := api.ds.CountSpotsTaken(lot.VenueId, lot.Id)
+		spots, err := api.ds.CountSpotsTaken(vid, lid)
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, err)
 			return

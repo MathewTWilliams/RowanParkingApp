@@ -15,7 +15,7 @@ func (api *API) RouteVenues() {
 func (api *API) GetVenues(c *gin.Context) {
 	var venues []models.Venue
 	var err error
-	venues, err = api.ds.SelectVenues(nil, nil)
+	venues, err = api.ds.SelectVenues(nil)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
@@ -31,7 +31,7 @@ func (api *API) GetVenueById(c *gin.Context) {
 	vid := c.Param("vid")
 	var conditions []string
 	conditions = append(conditions, "Where Id = "+vid)
-	queryResult, err = api.ds.SelectVenues(nil, conditions)
+	queryResult, err = api.ds.SelectVenues(conditions)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
@@ -55,6 +55,7 @@ func (api *API) PostVenue(c *gin.Context) {
 	var newVenue models.Venue
 	newVenue.VenueName = payload.VenueName
 	newVenue.SetVenueLocation_Coords(payload.Latitude, payload.Longitude)
+	newVenue.Timezone = payload.Timezone
 
 	v_id, err := api.ds.InsertVenue(newVenue)
 	if err != nil {

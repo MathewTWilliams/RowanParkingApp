@@ -20,7 +20,7 @@ func (api *API) GetLotRatings(c *gin.Context) {
 	var err error
 	var ratings []models.Lot_Rating
 
-	ratings, err = api.ds.SelectLotRatings(nil, nil)
+	ratings, err = api.ds.SelectLotRatings(nil)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 		return
@@ -69,7 +69,7 @@ func (api *API) PostLotRating(c *gin.Context) {
 		return
 	}
 
-	venues, err := api.ds.SelectVenues(nil, []string{"Where Id = " + strconv.FormatInt(vid, 10)})
+	venues, err := api.ds.SelectVenues([]string{"Where Id = " + strconv.FormatInt(vid, 10)})
 	if err != nil || len(venues) == 0 || len(venues) > 1 {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 		return

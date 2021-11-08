@@ -41,7 +41,7 @@ func (api *API) GetBugReports(c *gin.Context) {
 	var bugs []models.Bug
 	var err error
 
-	bugs, err = api.ds.SelectBugs(nil, nil)
+	bugs, err = api.ds.SelectBugs(nil)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 		return

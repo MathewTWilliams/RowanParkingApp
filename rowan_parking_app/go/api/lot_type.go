@@ -24,7 +24,7 @@ func (api *API) GetLotTypes(c *gin.Context) {
 		conditions = append(conditions, "Where VenueId = "+v_id)
 	}
 
-	types, err = api.ds.SelectLotTypes(nil, conditions)
+	types, err = api.ds.SelectLotTypes(conditions)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 		return

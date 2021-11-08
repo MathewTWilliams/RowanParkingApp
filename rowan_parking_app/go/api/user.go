@@ -27,7 +27,7 @@ func (api *API) GetUsers(c *gin.Context) {
 		conditions = append(conditions, "Where Venueid = "+v_id)
 	}
 
-	users, err = api.ds.SelectUsers(nil, conditions)
+	users, err = api.ds.SelectUsers(conditions)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 		return
@@ -68,7 +68,7 @@ func (api *API) TryPostUser(c *gin.Context) {
 		return
 	}
 
-	users, err := api.ds.SelectUsers(nil, []string{"Where Id = " + strconv.FormatInt(uid, 10)})
+	users, err := api.ds.SelectUsers([]string{"Where Id = " + strconv.FormatInt(uid, 10)})
 	if err != nil || len(users) == 0 || len(users) > 1 {
 		log.Println(err.Error())
 		c.IndentedJSON(http.StatusInternalServerError, err)
