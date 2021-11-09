@@ -52,6 +52,7 @@ func (v *Venue) GetVenueLocation_Bytes() ([]byte, error) {
 		return nil, fmt.Errorf("GetVenueLocation_Bytes: %v", err)
 	}
 
+	//ewkb.Marshal might not work
 	geom_point_bytes, err := ewkb.Marshal(geom_point, binary.LittleEndian)
 	if err != nil {
 		return nil, fmt.Errorf("GetVenueLocation_Bytes: %v", err)

@@ -30,7 +30,10 @@ func (ds *DataStore) SelectUsers(conditions []string) ([]models.User, error) {
 		}
 
 		var settings models.SettingsJson
-		json.Unmarshal(temp, &settings)
+		err = json.Unmarshal(temp, &settings)
+		if err != nil {
+			return nil, fmt.Errorf("SelectUsers: %v", err)
+		}
 		user.Settings = settings
 		users = append(users, user)
 	}

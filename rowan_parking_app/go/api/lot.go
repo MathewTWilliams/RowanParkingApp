@@ -26,7 +26,7 @@ func (api *API) GetLotsFromVenue(c *gin.Context) {
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 	} else if len(lots) == 0 {
-		c.IndentedJSON(http.StatusNoContent, []models.Lot{})
+		c.IndentedJSON(http.StatusNoContent, lots)
 	} else {
 		var responses []models.GetLotResponse
 		for _, lot := range lots {

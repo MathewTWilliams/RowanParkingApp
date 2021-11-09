@@ -57,12 +57,17 @@ func (api *API) PostCheckIn(c *gin.Context) {
 	checkin_id, err := api.ds.InsertCheckIn(checkInResponse.CheckInInfo)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
-
-	} else {
-		checkInResponse.CheckInInfo.Id = checkin_id
-		checkInResponse.SpotsTaken, _ = api.ds.CountSpotsTaken(v_id, c.Param("lid"))
-		c.IndentedJSON(http.StatusCreated, checkInResponse)
+		return
 	}
+
+	checkInResponse.CheckInInfo.Id = checkin_id
+	checkInResponse.SpotsTaken, err = api.ds.CountSpotsTaken(v_id, c.Param("lid"))
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
+	}
+	c.IndentedJSON(http.StatusCreated, checkInResponse)
+
 }
 
 func (api *API) GetLotCheckIns(c *gin.Context) {

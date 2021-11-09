@@ -63,22 +63,23 @@ func (api *API) PostLotRating(c *gin.Context) {
 		return
 	}
 
-	vid, err := strconv.ParseInt(c.Param("vid"), 10, 64)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, err)
-		return
-	}
+	vid := c.Param("vid")
 
-	venues, err := api.ds.SelectVenues([]string{"Where Id = " + strconv.FormatInt(vid, 10)})
+	venues, err := api.ds.SelectVenues([]string{"Where Id = " + vid})
 	if err != nil || len(venues) == 0 || len(venues) > 1 {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 		return
 	}
 
+	location, err := time.LoadLocation(venues[0].Timezone)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
+	}
 	var newLotRating models.Lot_Rating
 	newLotRating.LotId = lid
 	newLotRating.Review = payload.Review
-	newLotRating.TimeOfReview = time.Now()
+	newLotRating.TimeOfReview = time.Now().In(location)
 	newLotRating.UserId = payload.UserId
 
 	lr_id, err := api.ds.InsertLotRating(newLotRating)

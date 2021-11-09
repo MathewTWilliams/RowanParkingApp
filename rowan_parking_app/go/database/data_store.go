@@ -77,7 +77,6 @@ func (ds *DataStore) CountSpotsTaken(v_id string, l_id string) (int64, error) {
 	rows, err = ds.DB.Query(q)
 
 	if err != nil {
-		log.Println(err.Error())
 		return -1, fmt.Errorf("CountSpotsTaken: %v", err)
 	}
 
@@ -88,7 +87,6 @@ func (ds *DataStore) CountSpotsTaken(v_id string, l_id string) (int64, error) {
 		var check_out_null sql.NullTime
 		err = rows.Scan(&check_in, &check_out_null)
 		if err != nil {
-			log.Println(err.Error())
 			return -1, fmt.Errorf("CountSpotsTaken: %v", err)
 		}
 

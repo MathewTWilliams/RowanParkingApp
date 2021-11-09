@@ -3,7 +3,6 @@ package api
 import (
 	"RPA/backend/constants"
 	"RPA/backend/models"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -59,7 +58,6 @@ func (api *API) TryPostUser(c *gin.Context) {
 		user.VenueId = payload.VenueId
 		uid, err = api.ds.InsertUser(user)
 		if err != nil {
-			log.Println(err.Error())
 			c.IndentedJSON(http.StatusInternalServerError, err)
 			return
 		}
@@ -70,8 +68,8 @@ func (api *API) TryPostUser(c *gin.Context) {
 
 	users, err := api.ds.SelectUsers([]string{"Where Id = " + strconv.FormatInt(uid, 10)})
 	if err != nil || len(users) == 0 || len(users) > 1 {
-		log.Println(err.Error())
 		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
 	}
 
 	c.IndentedJSON(http.StatusOK, users[0])

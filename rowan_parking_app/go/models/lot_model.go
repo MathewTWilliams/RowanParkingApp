@@ -29,7 +29,7 @@ func (l *Lot) SetBoundingBox_Bytes(bytes []byte) error {
 		return fmt.Errorf("SetBoundingBox_Bytes: %v", err)
 	}
 
-	l.BoundingBox, err = geojson.Encode(bb.(*geom.Point).SetSRID(constants.SRID))
+	l.BoundingBox, err = geojson.Encode(bb.(*geom.Polygon).SetSRID(constants.SRID))
 	if err != nil {
 		return fmt.Errorf("SetBoundingBox_Bytes: %v", err)
 	}
