@@ -69,3 +69,30 @@ func (api *API) GetLotFromVenue(c *gin.Context) {
 		c.IndentedJSON(http.StatusOK, models.GetLotResponse{SpotsTaken: spots, LotInfo: lot})
 	}
 }
+
+func (api *API) PostLot(c *gin.Context) {
+	var payload models.PostLotPayload
+
+	err := c.BindJSON(&payload)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	var newLot models.Lot
+	newLot.LotName = payload.LotName
+	newLot.LotDescription = payload.LotDescription
+	newLot.LotType = payload.LotType
+	newLot.NumSpaces = payload.NumSpaces
+	newLot.SpecificRules = payload.SpecificRules
+
+	l_id, err := api.ds.InsertLot(newLot)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	newLot.Id = l_id
+	c.IndentedJSON(http.StatusCreated, newLot)
+
+}

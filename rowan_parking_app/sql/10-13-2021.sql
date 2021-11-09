@@ -5,7 +5,10 @@
     - Made sure all Spatial data related columns are labeled as Not NULL.
     
     -With these two adjustments above, we can have indexing of spatial
-        data related columns if needed.  */
+        data related columns if needed.  
+        
+  Changes made on 11/8/2021
+    - BoundingBox and LotLocation are now allowed to be defaulted to NULL.*/
 
 USE RowanParkingApp; 
 
@@ -13,8 +16,8 @@ ALTER TABLE Venues
 MODIFY VenueLocation POINT NOT NULL SRID 3857; 
 
 ALTER TABLE Lots
-MODIFY BoundingBox Polygon NOT NULL SRID 3857, 
-MODIFY LotLocation Point NOT NULL SRID 3857; 
+MODIFY BoundingBox Polygon SRID 3857, 
+MODIFY LotLocation Point SRID 3857; 
 
 
 

@@ -40,3 +40,14 @@ type PostLotTypePayload struct {
 	TypeName string `json:"TypeName"`
 	Rules    string `json:"Rules"`
 }
+
+type PostLotPayload struct {
+	LotName        string `json:"LotName"`
+	LotDescription string `json:"LotDescription"`
+	LotType        int64  `json:"LotType"`
+	NumSpaces      int64  `json:"NumSpaces"`
+	SpecificRules  string `json:"SpecificRules"`
+
+	//BoundingBox type? `json:"BoundingBox"`
+	//LotLocation type? `json:"LotLocation"`
+}

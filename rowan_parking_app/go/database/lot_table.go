@@ -46,3 +46,26 @@ func (ds *DataStore) SelectLots(conditions []string) ([]models.Lot, error) {
 	return lots, nil
 
 }
+
+func (ds *DataStore) InsertLot(lot models.Lot) (int64, error) {
+	cols := []string{"Id", "LotName", "LotDescription",
+		"LotType", "NumSpaces", "VenueId",
+		"SpecificRules", "BoundingBox", "LotLocation"}
+
+	query := ds.InsertQueryBuilder(constants.TABLENAME_LOTS, cols)
+
+	result, err := ds.Exec(query, lot.Id, lot.LotName, lot.LotDescription,
+		lot.LotType, lot.NumSpaces, lot.VenueId, lot.SpecificRules,
+		nil, nil)
+
+	if err != nil {
+		return -1, fmt.Errorf("InsertLot: %v", err)
+	}
+
+	l_id, err := result.LastInsertId()
+	if err != nil {
+		return -1, fmt.Errorf("InsertLot: %v", err)
+	}
+
+	return l_id, nil
+}
