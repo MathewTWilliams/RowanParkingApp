@@ -11,6 +11,7 @@ import (
 func (api *API) RouteLots() {
 	api.router.GET("/api/venues/:vid/lots", api.GetLotsFromVenue)
 	api.router.GET("/api/venues/:vid/lots/:lid", api.GetLotFromVenue)
+	api.router.POST("/api/venues/:vid/post_lot", api.PostLot)
 }
 
 func (api *API) GetLotsFromVenue(c *gin.Context) {
@@ -79,12 +80,19 @@ func (api *API) PostLot(c *gin.Context) {
 		return
 	}
 
+	v_id, err := strconv.ParseInt(c.Param("vid"), 10, 64)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, err)
+		return
+	}
+
 	var newLot models.Lot
 	newLot.LotName = payload.LotName
 	newLot.LotDescription = payload.LotDescription
 	newLot.LotType = payload.LotType
 	newLot.NumSpaces = payload.NumSpaces
 	newLot.SpecificRules = payload.SpecificRules
+	newLot.VenueId = v_id
 
 	l_id, err := api.ds.InsertLot(newLot)
 	if err != nil {
