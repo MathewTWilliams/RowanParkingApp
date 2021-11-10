@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:settings_ui/settings_ui.dart';
 //import 'package:shared_preferences_settings/shared_preferences_settings.dart';
 
-import '../main.dart';
 
 bool darkModeToggled = false;
 bool value = false;
@@ -21,8 +21,8 @@ class SettingsWidget extends StatefulWidget {
 
 class SettingsWidgetState extends State<SettingsWidget> {
   static const darkModeKey = 'dark-mode';
-  bool isBusy = false;
-  bool isLoggedIn = true;
+  //bool isBusy = false;
+  //bool isLoggedIn = true;
 
   @override
   Widget build(BuildContext context) => SettingsList(
@@ -58,24 +58,23 @@ class SettingsWidgetState extends State<SettingsWidget> {
               title: 'Logout of app' ,
               subtitle: 'Bye',
               leading: Icon(Icons.logout),
-              onPressed: (BuildContext context) {() async {
-                //await logoutAction(); //Not working yet
-              };
-              //put in the navigation pop thing here
-              },
+              onPressed: (BuildContext context) {
+                //exits the app based on the platform
+                //apparently the way it closes matters?? lord google say so
+                Future.delayed(const Duration(milliseconds: 500), (){
+                  if (Platform.isAndroid) {
+                    print('Logged off of an Android');
+                    SystemNavigator.pop();
+                  } else if (Platform.isIOS) {
+                    print('Logged off of an iOS');
+                    exit(0);
+                }});
+              }, //end of onPressed
           )
-        ],
+        ], //End of Misc. Tiles section
       )
     ]
   );
-
-  Future<void> logoutAction() async {
-    await secureStorage.delete(key: 'refresh_token');
-    setState(() {
-      isLoggedIn = false;
-      isBusy = false;
-    });
-  }
 
 }
 
