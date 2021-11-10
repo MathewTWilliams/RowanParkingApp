@@ -108,7 +108,7 @@ class CheckoutWidget extends StatelessWidget {
     }catch(e){
       return Scaffold(
           appBar: AppBar(
-              title: Text("${lotEntry.lotInfo.lotName} Information Error")),
+              title: Text("Information Error")),
           body: Center(
               child: SizedBox(width: 200, height: 200, child: CircularProgressIndicator())
         )
