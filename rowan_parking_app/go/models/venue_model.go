@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	geom "github.com/twpayne/go-geom"
-	"github.com/twpayne/go-geom/encoding/ewkb"
 	"github.com/twpayne/go-geom/encoding/geojson"
 	"github.com/twpayne/go-geom/encoding/wkb"
 )
@@ -36,7 +35,8 @@ func (v *Venue) SetVenueLocation_Bytes(bytes []byte) error {
 func (v *Venue) SetVenueLocation_Coords(lat float64, long float64) error {
 	var point *geom.Point
 	var err error
-	point = geom.NewPointFlat(geom.XY, []float64{lat, long}).SetSRID(constants.SRID)
+	point = geom.NewPointFlat(geom.XY, []float64{long, lat}).SetSRID(constants.SRID)
+
 	v.VenueLocation, err = geojson.Encode(point)
 	if err != nil {
 		return fmt.Errorf("SetVenueLocation_Coords: %v", err)
@@ -48,15 +48,17 @@ func (v *Venue) SetVenueLocation_Coords(lat float64, long float64) error {
 func (v *Venue) GetVenueLocation_Bytes() ([]byte, error) {
 	var err error
 	geom_point, err := v.VenueLocation.Decode()
+
 	if err != nil {
 		return nil, fmt.Errorf("GetVenueLocation_Bytes: %v", err)
 	}
 
-	//ewkb.Marshal might not work
-	geom_point_bytes, err := ewkb.Marshal(geom_point, binary.LittleEndian)
+	geom_point_bytes, err := wkb.Marshal(geom_point, binary.LittleEndian)
 	if err != nil {
 		return nil, fmt.Errorf("GetVenueLocation_Bytes: %v", err)
 	}
 
-	return geom_point_bytes, nil
+	var srid_bytes [4]byte
+	binary.LittleEndian.PutUint32(srid_bytes[0:4], uint32(constants.SRID))
+	return append(srid_bytes[0:4], geom_point_bytes...), nil
 }
