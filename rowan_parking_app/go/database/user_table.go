@@ -24,9 +24,16 @@ func (ds *DataStore) SelectUsers(conditions []string) ([]models.User, error) {
 	for rows.Next() {
 		var user models.User
 		var temp []byte
-		err = rows.Scan(&user.Id, &temp, &user.UserName, &user.VenueId, &user.LastCheckIn)
+		var lci_null sql.NullInt64
+		err = rows.Scan(&user.Id, &temp, &user.UserName, &user.VenueId, &lci_null)
 		if err != nil {
 			return nil, fmt.Errorf("GetUsers: %v", err)
+		}
+
+		if lci_null.Valid {
+			user.LastCheckIn = lci_null.Int64
+		} else {
+			user.LastCheckIn = -1
 		}
 
 		var settings models.SettingsJson
