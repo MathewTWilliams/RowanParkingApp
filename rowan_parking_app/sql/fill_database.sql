@@ -2,12 +2,12 @@
 
 USE RowanParkingApp; 
 
-INSERT INTO Venues(Id, VenueName, VenueLocation)
-VALUES(1,"Rowan University", ST_GeomFromText("POINT(39.71 -75.11)", 3857)); 
+INSERT INTO Venues(Id, VenueName, VenueLocation, Timezone)
+VALUES(1,"Rowan University", ST_GeomFromText("POINT(-75.11 39.71)", 3857), "America/New_York"); 
 
-INSERT INTO Lot_Types(Id, TypeName, Rules)
+INSERT INTO Lot_Types(Id, TypeName, Rules, VenueId)
 VALUES(1, "Handicapped Parking", 
-    "Requires a Permit or handicapped liscense plate.");
+    "Requires a Permit or handicapped liscense plate.", 1);
 
 INSERT INTO Lots(Id, LotName, LotDescription, LotType, NumSpaces,
     VenueId, BoundingBox, 
