@@ -18,10 +18,15 @@ func (api *API) GetLotsFromVenue(c *gin.Context) {
 	var lots []models.Lot
 	var err error
 
-	vid := c.Param("vid")
+	v_id := c.Param("vid")
+	l_id := c.Param("lid")
+	if !api.AreIdsValid(v_id, l_id) {
+		c.IndentedJSON(http.StatusBadRequest, "")
+		return
+	}
 
 	var conditions []string
-	conditions = append(conditions, "Where VenueId = "+vid)
+	conditions = append(conditions, "Where VenueId = "+v_id)
 
 	lots, err = api.ds.SelectLots(conditions)
 	if err != nil {
@@ -31,7 +36,7 @@ func (api *API) GetLotsFromVenue(c *gin.Context) {
 	} else {
 		var responses []models.GetLotResponse
 		for _, lot := range lots {
-			spots, err := api.ds.CountSpotsTaken(vid, strconv.FormatInt(lot.Id, 10))
+			spots, err := api.ds.CountSpotsTaken(v_id, strconv.FormatInt(lot.Id, 10))
 			if err != nil {
 				c.IndentedJSON(http.StatusInternalServerError, err)
 				return
@@ -47,13 +52,16 @@ func (api *API) GetLotFromVenue(c *gin.Context) {
 	var queryResult []models.Lot
 	var err error
 
-	vid := c.Param("vid")
-	lid := c.Param("lid")
-
+	v_id := c.Param("vid")
+	l_id := c.Param("lid")
+	if !api.AreIdsValid(v_id, l_id) {
+		c.IndentedJSON(http.StatusBadRequest, "")
+		return
+	}
 	var conditions []string
 
-	conditions = append(conditions, "Where VenueID = "+vid)
-	conditions = append(conditions, " AND Id = "+lid)
+	conditions = append(conditions, "Where VenueID = "+v_id)
+	conditions = append(conditions, " AND Id = "+l_id)
 
 	queryResult, err = api.ds.SelectLots(conditions)
 	if err != nil {
@@ -62,7 +70,7 @@ func (api *API) GetLotFromVenue(c *gin.Context) {
 		c.IndentedJSON(http.StatusNoContent, models.Lot{})
 	} else {
 		lot := queryResult[0]
-		spots, err := api.ds.CountSpotsTaken(vid, lid)
+		spots, err := api.ds.CountSpotsTaken(v_id, l_id)
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, err)
 			return
@@ -75,16 +83,21 @@ func (api *API) PostLot(c *gin.Context) {
 	var payload models.PostLotPayload
 
 	err := c.BindJSON(&payload)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, err)
+	if err != nil || payload.LotName == "" ||
+		payload.LotType <= 0 || payload.NumSpaces <= 0 {
+
+		c.IndentedJSON(http.StatusBadRequest, "")
 		return
 	}
 
-	v_id, err := strconv.ParseInt(c.Param("vid"), 10, 64)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, err)
+	v_id := c.Param("vid")
+	l_id := c.Param("lid")
+	if !api.AreIdsValid(v_id, l_id) {
+		c.IndentedJSON(http.StatusBadRequest, "")
 		return
 	}
+
+	v_id_int, _ := strconv.ParseInt(v_id, 10, 64)
 
 	var newLot models.Lot
 	newLot.LotName = payload.LotName
@@ -92,15 +105,15 @@ func (api *API) PostLot(c *gin.Context) {
 	newLot.LotType = payload.LotType
 	newLot.NumSpaces = payload.NumSpaces
 	newLot.SpecificRules = payload.SpecificRules
-	newLot.VenueId = v_id
+	newLot.VenueId = v_id_int
 
-	l_id, err := api.ds.InsertLot(newLot)
+	l_id_int, err := api.ds.InsertLot(newLot)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 		return
 	}
 
-	newLot.Id = l_id
+	newLot.Id = l_id_int
 	c.IndentedJSON(http.StatusCreated, newLot)
 
 }

@@ -3,6 +3,7 @@ package api
 import (
 	"RPA/backend/constants"
 	"RPA/backend/models"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -21,6 +22,11 @@ func (api *API) GetUsers(c *gin.Context) {
 	var conditions []string
 
 	v_id := c.Param("vid")
+	l_id := c.Param("lid")
+	if !api.AreIdsValid(v_id, l_id) {
+		c.IndentedJSON(http.StatusBadRequest, "")
+		return
+	}
 
 	if v_id != "" {
 		conditions = append(conditions, "Where Venueid = "+v_id)
@@ -41,8 +47,13 @@ func (api *API) TryPostUser(c *gin.Context) {
 	var payload models.RegisterUserPayload
 
 	err = c.BindJSON(&payload)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, err)
+	if err != nil || payload.UserName == "" || payload.VenueId <= 0 {
+		c.IndentedJSON(http.StatusBadRequest, "")
+		return
+	}
+
+	if !api.AreIdsValid(strconv.FormatInt(payload.VenueId, 10), "") {
+		c.IndentedJSON(http.StatusBadRequest, "")
 		return
 	}
 
@@ -68,6 +79,7 @@ func (api *API) TryPostUser(c *gin.Context) {
 
 	users, err := api.ds.SelectUsers([]string{"Where Id = " + strconv.FormatInt(uid, 10)})
 	if err != nil || len(users) == 0 || len(users) > 1 {
+		log.Print("Error: " + err.Error())
 		c.IndentedJSON(http.StatusInternalServerError, err)
 		return
 	}

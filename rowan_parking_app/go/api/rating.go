@@ -10,7 +10,7 @@ import (
 )
 
 func (api *API) RouteRatings() {
-	api.router.POST("/api/venues/:vid/lots/:lid/rating", api.PostLotRating)
+	api.router.POST("/api/venues/:vid/lots/:lid/post_rating", api.PostLotRating)
 	api.router.GET("/api/lot_ratings", api.GetLotRatings)
 	api.router.GET("/api/venues/:vid/lot_ratings", api.GetLotRatings_Specific)
 	api.router.GET("api/venues/:vid/lots/:lid/lot_ratings", api.GetLotRatings_Specific)
@@ -35,11 +35,15 @@ func (api *API) GetLotRatings_Specific(c *gin.Context) {
 
 	l_id := c.Param("lid")
 	v_id := c.Param("vid")
+	if !api.AreIdsValid(v_id, l_id) {
+		c.IndentedJSON(http.StatusBadRequest, "")
+		return
+	}
 
 	ratings, err = api.ds.SelectLotRatings_Specific(v_id, l_id)
 
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, err)
+		c.IndentedJSON(http.StatusBadRequest, "")
 		return
 	}
 
@@ -52,20 +56,21 @@ func (api *API) PostLotRating(c *gin.Context) {
 
 	err := c.BindJSON(&payload)
 
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, err)
+	if err != nil || payload.Review <= 0 || payload.UserId <= 0 {
+		c.IndentedJSON(http.StatusBadRequest, "")
 		return
 	}
 
-	lid, err := strconv.ParseInt(c.Param("lid"), 10, 64)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, err)
+	l_id := c.Param("lid")
+	v_id := c.Param("vid")
+	if !api.AreIdsValid(v_id, l_id) {
+		c.IndentedJSON(http.StatusBadRequest, "")
 		return
 	}
 
-	vid := c.Param("vid")
+	l_id_int, _ := strconv.ParseInt(c.Param("lid"), 10, 64)
 
-	venues, err := api.ds.SelectVenues([]string{"Where Id = " + vid})
+	venues, err := api.ds.SelectVenues([]string{"Where Id = " + v_id})
 	if err != nil || len(venues) == 0 || len(venues) > 1 {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 		return
@@ -77,7 +82,7 @@ func (api *API) PostLotRating(c *gin.Context) {
 		return
 	}
 	var newLotRating models.Lot_Rating
-	newLotRating.LotId = lid
+	newLotRating.LotId = l_id_int
 	newLotRating.Review = payload.Review
 	newLotRating.TimeOfReview = time.Now().In(location)
 	newLotRating.UserId = payload.UserId

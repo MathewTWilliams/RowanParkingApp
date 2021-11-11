@@ -20,6 +20,12 @@ func (api *API) GetLotTypes(c *gin.Context) {
 	var conditions []string
 
 	v_id := c.Param("vid")
+	l_id := c.Param("lid")
+	if !api.AreIdsValid(v_id, l_id) {
+		c.IndentedJSON(http.StatusBadRequest, "")
+		return
+	}
+
 	if v_id != "" {
 		conditions = append(conditions, "Where VenueId = "+v_id)
 	}
@@ -38,20 +44,25 @@ func (api *API) PostLotType(c *gin.Context) {
 	var payload models.PostLotTypePayload
 
 	err := c.BindJSON(&payload)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, err)
+	if err != nil || payload.TypeName == "" {
+		c.IndentedJSON(http.StatusBadRequest, "")
 		return
 	}
 
-	v_id, err := strconv.ParseInt(c.Param("vid"), 10, 64)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, err)
+	v_id := c.Param("vid")
+	l_id := c.Param("lid")
+
+	if !api.AreIdsValid(v_id, l_id) {
+		c.IndentedJSON(http.StatusBadRequest, "")
+		return
 	}
+
+	v_id_int, _ := strconv.ParseInt(v_id, 10, 64)
 
 	var newType models.Lot_Type
 	newType.TypeName = payload.TypeName
 	newType.Rules = payload.Rules
-	newType.VenueId = v_id
+	newType.VenueId = v_id_int
 
 	lt_id, err := api.ds.InsertLotType(newType)
 	if err != nil {

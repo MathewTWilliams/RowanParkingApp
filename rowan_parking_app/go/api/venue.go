@@ -10,6 +10,7 @@ import (
 func (api *API) RouteVenues() {
 	api.router.GET("/api/venues", api.GetVenues)
 	api.router.GET("/api/venues/:vid", api.GetVenueById)
+	api.router.POST("/api/post_venue", api.PostVenue)
 }
 
 func (api *API) GetVenues(c *gin.Context) {
@@ -28,9 +29,15 @@ func (api *API) GetVenueById(c *gin.Context) {
 	var queryResult []models.Venue
 	var err error
 
-	vid := c.Param("vid")
+	v_id := c.Param("vid")
+	l_id := c.Param("lid")
+	if !api.AreIdsValid(v_id, l_id) {
+		c.IndentedJSON(http.StatusBadRequest, "")
+		return
+	}
+
 	var conditions []string
-	conditions = append(conditions, "Where Id = "+vid)
+	conditions = append(conditions, "Where Id = "+v_id)
 	queryResult, err = api.ds.SelectVenues(conditions)
 
 	if err != nil {
@@ -47,8 +54,8 @@ func (api *API) PostVenue(c *gin.Context) {
 
 	err := c.BindJSON(&payload)
 
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, err)
+	if err != nil || payload.Timezone == "" || payload.VenueName == "" {
+		c.IndentedJSON(http.StatusBadRequest, "")
 		return
 	}
 

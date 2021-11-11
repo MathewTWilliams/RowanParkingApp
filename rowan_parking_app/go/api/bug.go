@@ -17,8 +17,8 @@ func (api *API) PostBugReport(c *gin.Context) {
 
 	err := c.BindJSON(&payload)
 
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, err)
+	if err != nil || payload.UserId <= 0 || payload.BugReport == "" {
+		c.IndentedJSON(http.StatusBadRequest, "")
 		return
 	}
 

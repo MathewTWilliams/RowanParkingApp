@@ -21,19 +21,20 @@ func (api *API) PostCheckIn(c *gin.Context) {
 	var payload models.CheckInPayload
 
 	err := c.BindJSON(&payload)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, err)
+	if err != nil || payload.UserId <= 0 {
+		c.IndentedJSON(http.StatusBadRequest, "")
 		return
 	}
 
-	l_id, err := strconv.ParseInt(c.Param("lid"), 10, 64)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, err)
-		return
-
-	}
-
+	l_id := c.Param("lid")
 	v_id := c.Param("vid")
+
+	if !api.AreIdsValid(v_id, l_id) {
+		c.IndentedJSON(http.StatusBadRequest, "")
+		return
+	}
+
+	l_id_int, _ := strconv.ParseInt(l_id, 10, 64)
 
 	conds := []string{"Where Id = " + v_id}
 	result, err := api.ds.SelectVenues(conds)
@@ -50,7 +51,7 @@ func (api *API) PostCheckIn(c *gin.Context) {
 
 	checkInTime := time.Now().In(loc)
 	var checkInResponse models.PostCheckInResponse
-	checkInResponse.CheckInInfo.LotId = l_id
+	checkInResponse.CheckInInfo.LotId = l_id_int
 	checkInResponse.CheckInInfo.CheckInTime = checkInTime
 	checkInResponse.CheckInInfo.UserId = payload.UserId
 
@@ -91,6 +92,11 @@ func (api *API) GetLotCheckIns_Specific(c *gin.Context) {
 	v_id := c.Param("vid")
 	l_id := c.Param("lid")
 
+	if !api.AreIdsValid(v_id, l_id) {
+		c.IndentedJSON(http.StatusBadRequest, "")
+		return
+	}
+
 	check_ins, err = api.ds.SelectLotCheckIns_Specific(v_id, l_id)
 
 	if err != nil {
@@ -108,13 +114,18 @@ func (api *API) PutCheckOut(c *gin.Context) {
 	var err error
 
 	err = c.BindJSON(&payload)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, err)
+	if err != nil || payload.UserId == 0 {
+		c.IndentedJSON(http.StatusBadRequest, "")
 		return
 	}
 
 	v_id := c.Param("vid")
 	l_id := c.Param("lid")
+
+	if !api.AreIdsValid(v_id, l_id) {
+		c.IndentedJSON(http.StatusBadRequest, "")
+		return
+	}
 
 	conds := []string{"Where Id = " + v_id}
 	result, err := api.ds.SelectVenues(conds)
