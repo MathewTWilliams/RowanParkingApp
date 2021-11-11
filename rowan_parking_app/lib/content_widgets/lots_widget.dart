@@ -3,7 +3,7 @@ import 'lotinfo_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-import 'package:rowan_parking_app/api/lots.dart';
+import 'package:rowan_parking_app/api/requests.dart';
 
 void main() => runApp(const MaterialApp(home: LotsWidget()));
 
@@ -16,18 +16,19 @@ class LotsWidget extends StatefulWidget {
 }
 
 class LotsWidgetState extends State<LotsWidget> {
-  late Future<List<LotEntry>> futureLotEntries;
+  late Future<List<Lot>> futureLotEntries;
 
   @override
   void initState() {
     super.initState();
 
-    futureLotEntries = Lots.getLotEntryList();
+    futureLotEntries =
+        Requests.getLotList(1); // TODO get venueID instead of placeholder
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<LotEntry>>(
+    return FutureBuilder<List<Lot>>(
         future: futureLotEntries,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
@@ -36,7 +37,7 @@ class LotsWidgetState extends State<LotsWidget> {
                     shrinkWrap: true,
                     padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
                     children: <Widget>[
-                  for (LotEntry lotEntry in snapshot.data!)
+                  for (Lot lotEntry in snapshot.data!)
                     CheckinBox(lotEntry: lotEntry)
                 ]));
           } else if (snapshot.hasError){
@@ -54,7 +55,7 @@ class LotsWidgetState extends State<LotsWidget> {
 // Holds the information for what goes into the CheckinBox for the above listView
 class CheckinBox extends StatelessWidget {
   CheckinBox({required this.lotEntry});
-  LotEntry lotEntry;
+  Lot lotEntry;
 
   @override
   Widget build(BuildContext context) {
