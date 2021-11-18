@@ -23,6 +23,10 @@ type Lot struct {
 
 func (l *Lot) SetBoundingBox_Bytes(bytes []byte) error {
 	var err error
+
+	if len(bytes) == 0 {
+		return nil
+	}
 	bb, err := wkb.Unmarshal(bytes[constants.SRID_BYTE_OFFSET:])
 
 	if err != nil {
@@ -39,6 +43,10 @@ func (l *Lot) SetBoundingBox_Bytes(bytes []byte) error {
 
 func (l *Lot) SetLotLocation_Bytes(bytes []byte) error {
 	var err error
+
+	if len(bytes) == 0 {
+		return nil
+	}
 
 	ll, err := wkb.Unmarshal(bytes[constants.SRID_BYTE_OFFSET:])
 	if err != nil {

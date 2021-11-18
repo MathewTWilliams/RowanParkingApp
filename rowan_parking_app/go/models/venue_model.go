@@ -19,6 +19,10 @@ type Venue struct {
 
 func (v *Venue) SetVenueLocation_Bytes(bytes []byte) error {
 
+	if len(bytes) == 0 {
+		return nil
+	}
+
 	vl, err := wkb.Unmarshal(bytes[constants.SRID_BYTE_OFFSET:])
 	if err != nil {
 		return fmt.Errorf("SetVenueLocation_Bytes: %v", err)
