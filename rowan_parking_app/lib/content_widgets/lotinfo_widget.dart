@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-import 'package:rowan_parking_app/api/lots.dart';
+import 'package:rowan_parking_app/api/requests.dart';
 
 class LotInfoWidget extends StatelessWidget {
-  LotEntry lotEntry;
+  Lot lotEntry;
 
   LotInfoWidget({required this.lotEntry});
 
