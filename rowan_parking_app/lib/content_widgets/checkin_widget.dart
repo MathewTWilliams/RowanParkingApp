@@ -26,7 +26,7 @@ class CheckinWidget extends StatelessWidget {
               children: <Widget>[
                 for (Lot lotEntry in snapshot.data!)
                   CheckinBox(
-                    lotEntry: lotEntry,
+                    lot: lotEntry,
                   )
               ],
             ));
@@ -43,8 +43,8 @@ class CheckinWidget extends StatelessWidget {
 }
 
 class CheckinBox extends StatelessWidget {
-  CheckinBox({required this.lotEntry});
-  Lot lotEntry;
+  CheckinBox({required this.lot});
+  Lot lot;
 
   @override
   Widget build(BuildContext context) {
@@ -61,22 +61,24 @@ class CheckinBox extends StatelessWidget {
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
-                          Text(lotEntry.lotInfo.lotName,
+                          Text(lot.lotInfo.lotName,
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold)),
                           Text(
-                              '${lotEntry.lotInfo.numSpaces - lotEntry.spotsTaken}/${lotEntry.lotInfo.numSpaces} Spaces'),
-                          Text(lotEntry.lotInfo.lotDescription),
+                              '${lot.lotInfo.numSpaces - lot.spotsTaken}/${lot.lotInfo.numSpaces} Spaces'),
+                          Text(lot.lotInfo.lotDescription),
                         ]))),
             ElevatedButton(
-              child: Text('Check Into ${lotEntry.lotInfo.lotName}'),
+              child: Text('Check Into ${lot.lotInfo.lotName}'),
               onPressed: () {
+                Requests.checkin(lot.lotInfo.venueId, lot.lotInfo.id);
+
                 //Navigates to the Checkout screen
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => CheckoutWidget(
-                            nameLot: lotEntry.lotInfo.lotName,
+                            lot: lot,
                           )),
                 );
               },

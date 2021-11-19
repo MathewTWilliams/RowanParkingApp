@@ -84,7 +84,7 @@ class CheckinBox extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => LotInfoWidget(lotEntry: lotEntry)),
+                      builder: (context) => LotInfoWidget(lot: lotEntry)),
                 );
               },
             ),

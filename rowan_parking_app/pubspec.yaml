@@ -37,7 +37,7 @@ dependencies:
   http: ^0.12.1
   flutter_appauth: ^0.9.1
   flutter_secure_storage: ^3.3.3
-  shared_preferences_settings: ^1.2.0
+  shared_preferences: ^2.0.8
   settings_ui: ^1.0.0
 
 

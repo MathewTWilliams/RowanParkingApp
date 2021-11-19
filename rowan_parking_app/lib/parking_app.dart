@@ -4,33 +4,14 @@ import 'content_widgets/settings_widget.dart';
 import 'content_widgets/checkin_widget.dart';
 import 'content_widgets/bug_report_widget.dart';
 
-
-
-/* DEPRECATED
 class ParkingApp extends StatefulWidget {
-  const ParkingApp({Key? key}) : super(key: key);
+  ParkingApp({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => ParkingAppState();
 }
 
 class ParkingAppState extends State<ParkingApp> {
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(home: NavWidget());
-  }
-}
-*/
-
-class NavWidget extends StatefulWidget {
-  NavWidget({Key? key}) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => NavWidgetState();
-}
-
-class NavWidgetState extends State<NavWidget> {
   Widget body = LotsWidget();
   Text contentTitle = const Text("Parking Lots");
 

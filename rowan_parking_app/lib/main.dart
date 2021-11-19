@@ -7,8 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'parking_app.dart';
+import 'package:rowan_parking_app/api/requests.dart';
 
 final FlutterAppAuth appAuth = FlutterAppAuth();
 const FlutterSecureStorage secureStorage = FlutterSecureStorage();
@@ -142,7 +144,7 @@ class _MyAppState extends State<MyApp> {
               child: isBusy
                   ? const CircularProgressIndicator()
                   : isLoggedIn
-                      ? NavWidget() //Profile(logoutAction, name, picture)
+                      ? ParkingApp() //Profile(logoutAction, name, picture)
                       : Login(loginAction, errorMessage),
             ),
           ),
@@ -196,9 +198,12 @@ class _MyAppState extends State<MyApp> {
       await secureStorage.write(
           key: 'refresh_token', value: result.refreshToken);
 
-      print("WRITING ACCESS TOKEN: ${result.accessToken}");
       await secureStorage.write(
           key: 'access_token', value: result.accessToken);
+
+      final prefs = await SharedPreferences.getInstance();
+      LoginReceipt userInfo = await Requests.login(profile['nickname'], 1);
+      prefs.setInt('user_id', userInfo.id);
 
       setState(() {
         isBusy = false;

@@ -4,15 +4,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:rowan_parking_app/api/requests.dart';
 
 class LotInfoWidget extends StatelessWidget {
-  Lot lotEntry;
+  Lot lot;
 
-  LotInfoWidget({required this.lotEntry});
+  LotInfoWidget({required this.lot});
 
   @override
   Widget build(BuildContext context) {
     try{
       return Scaffold(
-          appBar: AppBar(title: Text("${lotEntry.lotInfo.lotName} Information")),
+          appBar: AppBar(title: Text("${lot.lotInfo.lotName} Information")),
             body: ListView(
             shrinkWrap: true,
             padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
@@ -20,17 +20,19 @@ class LotInfoWidget extends StatelessWidget {
               LotInfoBox(
                   rating: 'Good Availability',
                   spaces:
-                      '${lotEntry.lotInfo.numSpaces - lotEntry.spotsTaken}/${lotEntry.lotInfo.numSpaces} Spaces',
-                  permission: '${lotEntry.lotInfo.specificRules}'),
+                      '${lot.lotInfo.numSpaces - lot.spotsTaken}/${lot.lotInfo.numSpaces} Spaces',
+                  permission: '${lot.lotInfo.specificRules}'),
               ElevatedButton(
                 child: const Text('Check-in'),
                 onPressed: () {
+                  Requests.checkin(lot.lotInfo.venueId, lot.lotInfo.id);
+                  
                   //Navigates to the Checkout screen
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => CheckoutWidget(
-                              nameLot: lotEntry.lotInfo.lotName,
+                              lot: lot,
                             )),
                   );
                 },
@@ -40,7 +42,7 @@ class LotInfoWidget extends StatelessWidget {
     }catch(e){
       return Scaffold(
           appBar: AppBar(
-              title: Text("${lotEntry.lotInfo.lotName} Information Error")),
+              title: Text("${lot.lotInfo.lotName} Information Error")),
           body: Center(
               child: SizedBox(width: 200, height: 200, child: CircularProgressIndicator())
         )
@@ -82,8 +84,8 @@ class LotInfoBox extends StatelessWidget {
 **********************************
 */
 class CheckoutWidget extends StatelessWidget {
-  CheckoutWidget({Key? key, required this.nameLot}) : super(key: key);
-  String nameLot;
+  CheckoutWidget({Key? key, required this.lot}) : super(key: key);
+  Lot lot;
 
   @override
   Widget build(BuildContext context) {
@@ -96,10 +98,11 @@ class CheckoutWidget extends StatelessWidget {
           children: <Widget>[
             CheckoutBox(
                 rating: 'Test Rating',
-                lotName: 'You are checked into ' + nameLot + '.'),
+                lotName: 'You are checked into ' + lot.lotInfo.lotName + '.'),
             ElevatedButton(
-              child: Text('Check-out of ' + nameLot + '.'),
+              child: Text('Check-out of ' + lot.lotInfo.lotName + '.'),
               onPressed: () {
+                Requests.checkout(lot.lotInfo.venueId, lot.lotInfo.id);
                 Navigator.pop(context);
               },
             ),
