@@ -28,6 +28,7 @@ func (api *API) RouteAll() {
 func (api *API) InitAPI(ds *db.DataStore) {
 	api.ds = ds
 	api.router = gin.Default()
+	//api.router.Use(AuthMiddleware)
 	api.RouteAll()
 }
 
