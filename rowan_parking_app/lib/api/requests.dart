@@ -9,32 +9,35 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const String serverURL = "3.137.195.9";
+//const String serverURL = "127.0.0.1";
+
 const FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
 class Requests {
   static Future<List<Venue>> getVenueList() async {
     final String accessToken = await secureStorage.read(key: 'access_token');
-    final response = await http.get(Uri.parse('http://3.137.195.9/api/venues'),
-        headers: {'authorization': 'Basic $accessToken'});
+    final response = await http.get(Uri.parse('http://' + serverURL + '/api/venues'),
+        headers: {'authorization': accessToken});
 
     if (response.statusCode == 200) {
       return Venue.venueListFromJson(response.body);
     } else {
-      throw Exception('Received invalid server response trying to GET Venues');
+      throw Exception('Received invalid server response trying to GET Venues. Status Code: ' + response.statusCode.toString());
     }
   }
 
   static Future<VenueInfo> getVenueInfo(final int venueID) async {
     final String accessToken = await secureStorage.read(key: 'access_token');
     final response = await http.get(
-        Uri.parse('http://3.137.195.9//api/venues/$venueID'),
-        headers: {'authorization': 'Basic $accessToken'});
+        Uri.parse('http://' + serverURL + '/api/venues/$venueID'),
+        headers: {'authorization': accessToken});
 
     if (response.statusCode == 200) {
       return VenueInfo.venueInfoFromJson(response.body);
     } else {
       throw Exception(
-          'Received invalid server response trying to GET VenueInfo with ID: $venueID');
+          'Received invalid server response trying to GET VenueInfo with ID: $venueID. Status Code: ' + response.statusCode.toString());
     }
   }
 
@@ -42,14 +45,14 @@ class Requests {
     final String accessToken = await secureStorage.read(key: 'access_token');
 
     final response = await http.get(
-        Uri.parse('http://3.137.195.9/api/venues/$venueID/lots'),
-        headers: {'authorization': 'Basic $accessToken'});
+        Uri.parse('http://' + serverURL + '/api/venues/$venueID/lots'),
+        headers: {'authorization': accessToken});
 
     if (response.statusCode == 200) {
       return Lot.lotListFromJson(response.body);
     } else {
       throw Exception(
-          'Received invalid server response trying to GET Lots with venue ID $venueID');
+          'Received invalid server response trying to GET Lots with venue ID $venueID. Status Code: ' + response.statusCode.toString());
     }
 
     
@@ -59,14 +62,14 @@ class Requests {
   static Future<Lot> getLot(final int venueID, final int lotID) async {
     final String accessToken = await secureStorage.read(key: 'access_token');
     final response = await http.get(
-        Uri.parse('http://3.137.195.9/api/venues/$venueID/lots/$lotID'),
-        headers: {'authorization': 'Basic $accessToken'});
+        Uri.parse('http://' + serverURL + '/api/venues/$venueID/lots/$lotID'),
+        headers: {'authorization': accessToken});
 
     if (response.statusCode == 200) {
       return Lot.lotFromJson(response.body);
     } else {
       throw Exception(
-          'Received invalid server response trying to GET Lot with venue ID $venueID, lot ID $lotID');
+          'Received invalid server response trying to GET Lot with venue ID $venueID, lot ID $lotID. Status Code:' + response.statusCode.toString());
     }
   }
   */
@@ -79,8 +82,8 @@ class Requests {
       throw Exception('No user_id found in local storage');
 
     final response = await http.post(
-        Uri.parse('http://3.137.195.9/api/venues/$venueID/lots/$lotID/check_in'),
-        headers: {'authorization': 'Basic $accessToken', "Content-Type": "application/json"},
+        Uri.parse('http://' + serverURL + '/api/venues/$venueID/lots/$lotID/check_in'),
+        headers: {'authorization': accessToken, "Content-Type": "application/json"},
         body: json.encode({"UserId" : userID}));
 
     if (response.statusCode == 200 || response.statusCode == 201) { 
@@ -100,8 +103,8 @@ class Requests {
       throw Exception('No user_id found in local storage');
 
     final response = await http.post(
-        Uri.parse('http://3.137.195.9/api/venues/$venueID/lots/$lotID/check-out'),
-        headers: {'authorization': 'Basic $accessToken', "Content-Type": "application/json"},
+        Uri.parse('http://' + serverURL + '/api/venues/$venueID/lots/$lotID/check-out'),
+        headers: {'authorization': accessToken, "Content-Type": "application/json"},
         body: json.encode({"UserId" : userID}));
 
     if (response.statusCode == 200 || response.statusCode == 201) { 
@@ -116,8 +119,8 @@ class Requests {
   static Future<LoginReceipt> login(String username, int venueID) async {
     final String accessToken = await secureStorage.read(key: 'access_token');
     final response = await http.post(
-        Uri.parse('http://3.137.195.9/api/users/login'),
-        headers: {'authorization': 'Basic $accessToken'},
+        Uri.parse('http://' + serverURL + '/api/users/login'),
+        headers: {'authorization': accessToken},
         body: jsonEncode(<String, Object>
         {
           'UserName': username,
