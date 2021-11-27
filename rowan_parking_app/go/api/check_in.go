@@ -3,7 +3,6 @@ package api
 import (
 	"RPA/backend/constants"
 	"RPA/backend/models"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -36,12 +35,6 @@ func (api *API) GetLotCheckById(c *gin.Context) {
 
 	result, err := api.ds.SelectLotCheckIns(conds)
 	if err != nil || len(result) > 1 {
-		if err == nil {
-			fmt.Printf("Length of result: ")
-			fmt.Println(len(result))
-		} else {
-			fmt.Println(err.Error())
-		}
 		c.IndentedJSON(http.StatusInternalServerError, "")
 	} else if len(result) == 0 {
 		c.IndentedJSON(http.StatusNoContent, "")
