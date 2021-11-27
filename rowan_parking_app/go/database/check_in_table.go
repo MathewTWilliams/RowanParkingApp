@@ -14,6 +14,7 @@ func (ds *DataStore) SelectLotCheckIns(conditions []string) ([]models.Lot_Check_
 	var check_ins []models.Lot_Check_in
 	var err error
 	var rows *sql.Rows
+	var check_out_null sql.NullTime
 
 	rows, err = ds.DB.Query(ds.SelectQueryBuilder(constants.TABLENAME_LCI, conditions))
 
@@ -26,10 +27,16 @@ func (ds *DataStore) SelectLotCheckIns(conditions []string) ([]models.Lot_Check_
 	for rows.Next() {
 		var lci models.Lot_Check_in
 
-		err = rows.Scan(&lci.Id, &lci.LotId, &lci.CheckInTime, &lci.CheckOutTime,
+		err = rows.Scan(&lci.Id, &lci.LotId, &lci.CheckInTime, &check_out_null,
 			&lci.UserId)
 		if err != nil {
 			return nil, fmt.Errorf("SelectLotCheckIns: %v", err)
+		}
+
+		if check_out_null.Valid {
+			lci.CheckOutTime = check_out_null.Time
+		} else {
+			lci.CheckOutTime = *new(time.Time)
 		}
 
 		check_ins = append(check_ins, lci)
