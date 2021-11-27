@@ -40,9 +40,9 @@ func (api *API) GetVenueById(c *gin.Context) {
 	conditions = append(conditions, "Where Id = "+v_id)
 	queryResult, err = api.ds.SelectVenues(conditions)
 
-	if err != nil {
+	if err != nil || len(queryResult) > 1 {
 		c.IndentedJSON(http.StatusInternalServerError, err)
-	} else if len(queryResult) == 0 || len(queryResult) > 1 {
+	} else if len(queryResult) == 0 {
 		c.IndentedJSON(http.StatusNoContent, []models.Venue{})
 	} else {
 		c.IndentedJSON(http.StatusOK, queryResult[0])

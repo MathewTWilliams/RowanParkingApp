@@ -1,6 +1,7 @@
 package api
 
 import (
+	"RPA/backend/constants"
 	"RPA/backend/models"
 	"net/http"
 	"strconv"
@@ -15,6 +16,32 @@ func (api *API) RouteCheckIns() {
 	api.router.GET("/api/venues/:vid/check_ins", api.GetLotCheckIns_Specific)
 	api.router.GET("/api/venues/:vid/lots/:lid/check_ins", api.GetLotCheckIns_Specific)
 	api.router.PUT("/api/venues/:vid/lots/:lid/check_out", api.PutCheckOut)
+	api.router.GET("/api/check_ins/:cid", api.GetLotCheckById)
+}
+
+func (api *API) GetLotCheckById(c *gin.Context) {
+	c_id := c.Param("cid")
+	c_id_int, err := strconv.ParseInt(c_id, 10, 64)
+	if err != nil || c_id_int <= 0 {
+		c.IndentedJSON(http.StatusBadRequest, "")
+		return
+	}
+
+	conds := []string{"Where Id = " + c_id}
+	if api.ds.CheckIfExists(constants.TABLENAME_LCI, conds) == -1 {
+		c.IndentedJSON(http.StatusBadRequest, "")
+		return
+	}
+
+	result, err := api.ds.SelectLotCheckIns(conds)
+	if err != nil || len(result) > 1 {
+		c.IndentedJSON(http.StatusInternalServerError, "")
+	} else if len(result) == 0 {
+		c.IndentedJSON(http.StatusNoContent, "")
+	} else {
+		c.IndentedJSON(http.StatusOK, result[0])
+	}
+
 }
 
 func (api *API) PostCheckIn(c *gin.Context) {
