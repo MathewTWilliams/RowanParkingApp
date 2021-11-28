@@ -169,12 +169,27 @@ func (api *API) PutCheckOut(c *gin.Context) {
 
 	check_out_time := time.Now().In(loc)
 	u_id := strconv.FormatInt(payload.UserId, 10)
-	_, err = api.ds.InsertCheckOut(check_out_time, u_id, l_id)
-
+	ci_id, err := api.ds.InsertCheckOut(check_out_time, u_id, l_id)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 		return
 	}
 
-	c.IndentedJSON(http.StatusCreated, nil)
+	conds = []string{"Where Id = " + strconv.FormatInt(ci_id, 10)}
+	check_in, err := api.ds.SelectLotCheckIns(conds)
+	if err != nil || len(check_in) > 1 || len(check_in) == 0 {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	//Reusing the PostCheckInResponse struct for this method
+	var response models.PostCheckInResponse
+	response.CheckInInfo = check_in[0]
+	response.SpotsTaken, err = api.ds.CountSpotsTaken(v_id, l_id)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.IndentedJSON(http.StatusAccepted, response)
 }
