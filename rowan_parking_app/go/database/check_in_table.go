@@ -142,13 +142,9 @@ func (ds *DataStore) InsertCheckOut(check_out_time time.Time, u_id string, l_id 
 		return -1, fmt.Errorf("InsertCheckOut: %v", err)
 	}
 
-	//need to grab id of the row affected
-	//rgx := regexp.MustCompile(`\.`)
-	//query_time := rgx.Split(check_out_time.String(), 2)[0]
-
 	conds = []string{"Where UserId = " + u_id,
 		"And LotId = " + l_id,
-		"And CheckOutTime = " + check_out_time.String()}
+		"Order by Id Desc Limit 1"}
 
 	id := ds.CheckIfExists(constants.TABLENAME_LCI, conds)
 	return id, nil
