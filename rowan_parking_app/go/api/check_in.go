@@ -157,13 +157,13 @@ func (api *API) PutCheckOut(c *gin.Context) {
 	conds := []string{"Where Id = " + v_id}
 	result, err := api.ds.SelectVenues(conds)
 	if err != nil || len(result) == 0 || len(result) > 1 {
-		c.IndentedJSON(http.StatusInternalServerError, err)
+		c.IndentedJSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	loc, err := time.LoadLocation(result[0].Timezone)
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, err)
+		c.IndentedJSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -171,14 +171,14 @@ func (api *API) PutCheckOut(c *gin.Context) {
 	u_id := strconv.FormatInt(payload.UserId, 10)
 	ci_id, err := api.ds.InsertCheckOut(check_out_time, u_id, l_id)
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, err)
+		c.IndentedJSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	conds = []string{"Where Id = " + strconv.FormatInt(ci_id, 10)}
 	check_in, err := api.ds.SelectLotCheckIns(conds)
 	if err != nil || len(check_in) > 1 || len(check_in) == 0 {
-		c.IndentedJSON(http.StatusInternalServerError, err)
+		c.IndentedJSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -187,7 +187,7 @@ func (api *API) PutCheckOut(c *gin.Context) {
 	response.CheckInInfo = check_in[0]
 	response.SpotsTaken, err = api.ds.CountSpotsTaken(v_id, l_id)
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, err)
+		c.IndentedJSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
