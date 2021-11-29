@@ -5,7 +5,6 @@ import (
 	"RPA/backend/models"
 	"database/sql"
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -144,12 +143,12 @@ func (ds *DataStore) InsertCheckOut(check_out_time time.Time, u_id string, l_id 
 	}
 
 	//need to grab id of the row affected
-	rgx := regexp.MustCompile(`\s[+-]`)
-	query_time := rgx.Split(check_out_time.String(), 2)[0]
+	//rgx := regexp.MustCompile(`\.`)
+	//query_time := rgx.Split(check_out_time.String(), 2)[0]
 
 	conds = []string{"Where UserId = " + u_id,
 		"And LotId = " + l_id,
-		"And CheckOutTime = " + query_time}
+		"And CheckOutTime = " + check_out_time.String()}
 
 	id := ds.CheckIfExists(constants.TABLENAME_LCI, conds)
 	return id, nil
