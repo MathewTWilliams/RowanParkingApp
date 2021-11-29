@@ -178,7 +178,7 @@ func (api *API) PutCheckOut(c *gin.Context) {
 	conds = []string{"Where Id = " + strconv.FormatInt(ci_id, 10)}
 	check_in, err := api.ds.SelectLotCheckIns(conds)
 	if err != nil || len(check_in) > 1 || len(check_in) == 0 {
-		c.IndentedJSON(http.StatusInternalServerError, err.Error())
+		c.IndentedJSON(http.StatusInternalServerError, "")
 		return
 	}
 
