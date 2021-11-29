@@ -142,7 +142,7 @@ func (api *API) PutCheckOut(c *gin.Context) {
 
 	err = c.BindJSON(&payload)
 	if err != nil || payload.UserId == 0 {
-		c.IndentedJSON(http.StatusBadRequest, "")
+		c.IndentedJSON(http.StatusBadRequest, "Payload Issue")
 		return
 	}
 
@@ -150,14 +150,14 @@ func (api *API) PutCheckOut(c *gin.Context) {
 	l_id := c.Param("lid")
 
 	if !api.AreIdsValid(v_id, l_id) {
-		c.IndentedJSON(http.StatusBadRequest, "")
+		c.IndentedJSON(http.StatusBadRequest, "Ids are invalid")
 		return
 	}
 
 	conds := []string{"Where Id = " + v_id}
 	result, err := api.ds.SelectVenues(conds)
 	if err != nil || len(result) == 0 || len(result) > 1 {
-		c.IndentedJSON(http.StatusInternalServerError, err.Error())
+		c.IndentedJSON(http.StatusInternalServerError, "Select Venue Failed")
 		return
 	}
 
@@ -178,7 +178,7 @@ func (api *API) PutCheckOut(c *gin.Context) {
 	conds = []string{"Where Id = " + strconv.FormatInt(ci_id, 10)}
 	check_in, err := api.ds.SelectLotCheckIns(conds)
 	if err != nil || len(check_in) > 1 || len(check_in) == 0 {
-		c.IndentedJSON(http.StatusInternalServerError, "")
+		c.IndentedJSON(http.StatusInternalServerError, "Select Check in failed")
 		return
 	}
 

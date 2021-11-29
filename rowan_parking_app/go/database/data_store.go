@@ -116,7 +116,6 @@ func (ds *DataStore) CheckIfExists(tablename string, conditions []string) int64 
 	err = result.Scan(&id)
 
 	if err != nil {
-		fmt.Println(err.Error())
 		return -1
 	}
 
