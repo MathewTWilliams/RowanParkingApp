@@ -32,7 +32,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   Widget build(BuildContext context) {
     return DropdownButton<String>(
       value: dropdownValue,
-      style: const TextStyle(color: Color(0xFFFFCC00),fontSize: 17),
+      style: const TextStyle(color: Color(0xFFFFCC00),fontSize: 15),
       underline: Container(
       ),
       onChanged: (String? newValue) {
