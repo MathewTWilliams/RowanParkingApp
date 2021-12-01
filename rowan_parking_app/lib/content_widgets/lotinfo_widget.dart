@@ -91,7 +91,7 @@ class CheckoutWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     try{
     return Scaffold(
-        appBar: AppBar(title: const Text("Ready to Check-Out?")),
+        appBar: AppBar(title: const Text("Ready to Check-Out?"), automaticallyImplyLeading: false), // automaticallyImplyLeading: false disables the back arrow
         body: ListView(
           shrinkWrap: true,
           padding: const EdgeInsets.fromLTRB(10.0, 50.0, 10.0, 20.0),
@@ -103,7 +103,7 @@ class CheckoutWidget extends StatelessWidget {
               child: Text('Check-out of ' + lot.lotInfo.lotName + '.'),
               onPressed: () {
                 Requests.checkout(lot.lotInfo.venueId, lot.lotInfo.id);
-                Navigator.pop(context);
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -129,7 +129,10 @@ class CheckoutBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    // Encapsulating WillPopScope prevents the system popping the context outside of the checkout button
+    // TODO this also prevents the system back arrow being used at all while in the checkout widget
+    return WillPopScope(onWillPop: () async => false,
+    child: Container(
         padding: const EdgeInsets.all(2),
         height: 120,
         child: Card(
@@ -139,6 +142,6 @@ class CheckoutBox extends StatelessWidget {
             Text(rating, style: const TextStyle(fontWeight: FontWeight.bold)),
             Text(lotName),
           ],
-        )));
+        ))));
   }
 }

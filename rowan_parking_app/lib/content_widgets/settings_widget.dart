@@ -1,18 +1,13 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 import 'package:settings_ui/settings_ui.dart';
-//import 'package:shared_preferences_settings/shared_preferences_settings.dart';
 
-
-bool darkModeToggled = false;
-bool value = false;
+//TODO: this has a different theme than the other pages, unsure why. Style likely undefined for its widgets
 
 class SettingsWidget extends StatefulWidget {
+  final Future<void> Function() logoutAction;
 
-  SettingsWidget({Key? key}) : super(key: key) {}
+  SettingsWidget({Key? key, required this.logoutAction}) : super(key: key) {}
 
 
   @override
@@ -20,9 +15,6 @@ class SettingsWidget extends StatefulWidget {
 }
 
 class SettingsWidgetState extends State<SettingsWidget> {
-  static const darkModeKey = 'dark-mode';
-  //bool isBusy = false;
-  //bool isLoggedIn = true;
 
   @override
   Widget build(BuildContext context) => SettingsList(
@@ -59,16 +51,19 @@ class SettingsWidgetState extends State<SettingsWidget> {
               subtitle: 'Bye',
               leading: Icon(Icons.logout),
               onPressed: (BuildContext context) {
-                //exits the app based on the platform
-                //apparently the way it closes matters?? lord google say so
                 Future.delayed(const Duration(milliseconds: 500), (){
+                  widget.logoutAction();
+
+                  /* General design principle is that mobile apps don't exit until the user exits them. Keeping the code in case
+
                   if (Platform.isAndroid) {
                     print('Logged off of an Android');
                     SystemNavigator.pop();
                   } else if (Platform.isIOS) {
                     print('Logged off of an iOS');
                     exit(0);
-                }});
+                  }*/
+                });
               }, //end of onPressed
           )
         ], //End of Misc. Tiles section
@@ -103,13 +98,3 @@ SettingsList(
     ],
   );
 */
-
-/* original stuff
-Scaffold(
-        body: ListView(
-          children: [
-            SwitchSettingsTile(settingKey: darkModeKey, title: "Dark Mode (Unused)")
-          ],
-        ),
-      );
- */

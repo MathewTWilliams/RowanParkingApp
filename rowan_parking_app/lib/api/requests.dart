@@ -3,13 +3,15 @@
 
 // TODO break this down into single-responsibility libraries
 
+// ignore_for_file: import_of_legacy_library_into_null_safe
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const String serverURL = "3.137.195.9";
+const String serverURL = "3.137.195.9:8080";
 //const String serverURL = "127.0.0.1";
 
 const FlutterSecureStorage secureStorage = FlutterSecureStorage();
@@ -58,7 +60,7 @@ class Requests {
     
   }
 
-  /*
+  
   static Future<Lot> getLot(final int venueID, final int lotID) async {
     final String accessToken = await secureStorage.read(key: 'access_token');
     final response = await http.get(
@@ -72,7 +74,7 @@ class Requests {
           'Received invalid server response trying to GET Lot with venue ID $venueID, lot ID $lotID. Status Code:' + response.statusCode.toString());
     }
   }
-  */
+  
 
   static Future<CheckinReceipt> checkin(final int venueID, final int lotID) async {
     final String accessToken = await secureStorage.read(key: 'access_token');
@@ -86,8 +88,7 @@ class Requests {
         headers: {'authorization': accessToken, "Content-Type": "application/json"},
         body: json.encode({"UserId" : userID}));
 
-    if (response.statusCode == 200 || response.statusCode == 201) { 
-      print("successful checkin returned: ${response.body}");
+    if (response.statusCode == 200 || response.statusCode == 201) {
       return CheckinReceipt.checkinReceiptFromJson(response.body);
     } else {
       throw Exception(
@@ -102,13 +103,12 @@ class Requests {
     if(userID == -1)
       throw Exception('No user_id found in local storage');
 
-    final response = await http.post(
-        Uri.parse('http://' + serverURL + '/api/venues/$venueID/lots/$lotID/check-out'),
+    final response = await http.put(
+        Uri.parse('http://' + serverURL + '/api/venues/$venueID/lots/$lotID/check_out'),
         headers: {'authorization': accessToken, "Content-Type": "application/json"},
         body: json.encode({"UserId" : userID}));
 
-    if (response.statusCode == 200 || response.statusCode == 201) { 
-      print("successful checkout returned: ${response.body}");
+    if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
       return CheckinReceipt.checkinReceiptFromJson(response.body);
     } else {
       throw Exception(
@@ -137,9 +137,23 @@ class Requests {
     }
   }
 
+  static Future<CheckinInfo> getCheckinInfo(int checkinID) async {
+    final String accessToken = await secureStorage.read(key: 'access_token');
+    final response = await http.get(
+        Uri.parse('http://' + serverURL + '/api/check_ins/$checkinID'),
+        headers: {'authorization': accessToken},
+      );
+
+    if (response.statusCode == 200) {
+      CheckinInfo info = CheckinInfo.checkinInfoFromJson(response.body);
+      return info;
+    } else {
+      throw Exception(
+          'Received invalid server response trying to GET checkin info for checkin $checkinID');
+    }
+  }
+
 }
-
-
 
 class Venue {
   Venue({
@@ -207,6 +221,8 @@ class Lot {
         "SpotsTaken": spotsTaken,
         "LotInfo": lotInfo.toJson(),
     };
+
+    static Lot lotFromJson(String str) => Lot.fromJson(json.decode(str));
 
     static List<Lot> lotListFromJson(String str) => List<Lot>.from(json.decode(str).map((x) => Lot.fromJson(x)));
 
@@ -401,6 +417,10 @@ class LoginReceipt {
     int venueId;
     int lastCheckIn;
 
+    String toString(){
+      return "Venue $venueId, user $id, username $userName";
+    }
+
     factory LoginReceipt.fromJson(Map<String, dynamic> json) => LoginReceipt(
         id: json["Id"],
         settings: Settings.fromJson(json["Settings"]),
@@ -440,3 +460,42 @@ class Settings {
     };
 }
 
+String checkinInfoToJson(CheckinInfo data) => json.encode(data.toJson());
+
+class CheckinInfo {
+    CheckinInfo({
+        required this.checkinId,
+        required this.lotId,
+        required this.checkInTime,
+        required this.checkOutTime,
+        required this.userId,
+    });
+
+    int checkinId;
+    int lotId;
+    DateTime checkInTime;
+    DateTime checkOutTime;
+    int userId;
+
+    String toString(){
+      return "Checkin by user $userId, at venue $checkinId, lot $lotId, checked in at ${checkInTime.toString()}, checked out at ${checkOutTime.toString()}";
+    }
+
+    factory CheckinInfo.fromJson(Map<String, dynamic> json) => CheckinInfo(
+        checkinId: json["Id"],
+        lotId: json["LotId"],
+        checkInTime: DateTime.parse(json["CheckInTime"]),
+        checkOutTime: DateTime.parse(json["CheckOutTime"]),
+        userId: json["Userid"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "Id": checkinId,
+        "LotId": lotId,
+        "CheckInTime": checkInTime.toIso8601String(),
+        "CheckOutTime": checkOutTime.toIso8601String(),
+        "Userid": userId,
+    };
+
+    static CheckinInfo checkinInfoFromJson(String str) => CheckinInfo.fromJson(json.decode(str));
+}

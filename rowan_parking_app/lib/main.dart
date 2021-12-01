@@ -1,5 +1,7 @@
 // @dart=2.7
 
+// TODO: there's some duplication between loginAction and initState that I suspect could be refactored away
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -122,6 +124,7 @@ class MyApp extends StatefulWidget {
 /// -----------------------------------
 
 class _MyAppState extends State<MyApp> {
+  LoginReceipt userInfo;
   bool isBusy = false;
   bool isLoggedIn = false;
   String errorMessage;
@@ -135,20 +138,20 @@ class _MyAppState extends State<MyApp> {
         title: 'Rowan Parking App',
         theme: appTheme,
         home: Scaffold(
-          appBar: AppBar(
-            title: const Text('Rowan Parking App'),
-          ),
+          // Once logged in, the Parking App provides its own AppBar, so set to null to prevent two appearing
+          appBar: isLoggedIn? null : AppBar(title: const Text('Rowan Parking App')),
           body: Center(
             child: Container(
               alignment: Alignment.center,
               child: isBusy
                   ? const CircularProgressIndicator()
                   : isLoggedIn
-                      ? ParkingApp() //Profile(logoutAction, name, picture)
+                      ? ParkingApp(userInfo: userInfo, logoutAction: logoutAction)
                       : Login(loginAction, errorMessage),
             ),
           ),
-        ));
+        ),
+        );
   }
 
   Map<String, Object> parseIdToken(String idToken) {
@@ -202,12 +205,14 @@ class _MyAppState extends State<MyApp> {
           key: 'access_token', value: result.accessToken);
 
       final prefs = await SharedPreferences.getInstance();
-      LoginReceipt userInfo = await Requests.login(profile['nickname'], 1);
-      prefs.setInt('user_id', userInfo.id);
+      LoginReceipt receivedUserInfo = await Requests.login(profile['nickname'], 1);
+
+      prefs.setInt('user_id', receivedUserInfo.id);
 
       setState(() {
         isBusy = false;
         isLoggedIn = true;
+        userInfo = receivedUserInfo;
         name = idToken['name'];
         picture = profile['picture'];
       });
@@ -257,12 +262,15 @@ class _MyAppState extends State<MyApp> {
       final Map<String, Object> profile =
           await getUserDetails(response.accessToken);
 
+      LoginReceipt receivedUserInfo = await Requests.login(profile['nickname'], 1);
+
       await secureStorage.write(
           key: 'refresh_token', value: response.refreshToken);
 
       setState(() {
         isBusy = false;
         isLoggedIn = true;
+        userInfo = receivedUserInfo;
         name = idToken['name'];
         picture = profile['picture'];
       });

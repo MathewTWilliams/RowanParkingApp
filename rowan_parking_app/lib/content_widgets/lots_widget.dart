@@ -31,23 +31,23 @@ class LotsWidgetState extends State<LotsWidget> {
     return FutureBuilder<List<Lot>>(
         future: futureLotEntries,
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
+            if (snapshot.hasError){
+              return Text('${snapshot.error}');
+            }
             return Scaffold(
-                body: ListView(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
-                    children: <Widget>[
-                  for (Lot lotEntry in snapshot.data!)
-                    CheckinBox(lotEntry: lotEntry)
-                ]));
-          } else if (snapshot.hasError){
-            return Text('${snapshot.error}');
-          }
-            return Scaffold( //Loading screen while gathering information
               body: Center(
-                  child: SizedBox(width: 200, height: 200, child: CircularProgressIndicator())
-              )
-          );
+                child: Container(
+                  alignment: Alignment.center,
+                  child: !snapshot.hasData? Container(
+                    alignment: Alignment.center,
+                    child: const CircularProgressIndicator()) :
+                  ListView(
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
+                      children: <Widget>[
+                    for (Lot lotEntry in snapshot.data!)
+                      CheckinBox(lotEntry: lotEntry)
+                  ]))));
         });
   }
 }
