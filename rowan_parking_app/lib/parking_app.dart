@@ -36,26 +36,24 @@ class ParkingAppState extends State<ParkingApp> {
   }
 
   Future<void> loadLastCheckinInfo() async {
-    if (widget.userInfo.lastCheckIn >= 0 && lastCheckin != null) {
-      hasLastCheckin = true;
-      try {
-        receivedCheckinInfo =
-            await Requests.getCheckinInfo(widget.userInfo.lastCheckIn);
-      } catch (Exception) {
-        print("No previous checkin. whatever");
-      }
+    receivedCheckinInfo =
+        await Requests.getCheckinInfo(widget.userInfo.lastCheckIn);
 
-      /* When a user hasn't checked out, the server returns a checkout DateTime of the form 0001-01-01 00:00:00.000Z.
+    hasLastCheckin = widget.userInfo.lastCheckIn != -1;
+
+    /* When a user hasn't checked out, the server returns a checkout DateTime of the form 0001-01-01 00:00:00.000Z.
     Checking if checkout is before checkin should be robust enough to determine this, for now. */
-      if (hasLastCheckin)
-        currentlyCheckedIn = receivedCheckinInfo.checkOutTime
-            .isBefore(receivedCheckinInfo.checkInTime);
-    }
+    if (hasLastCheckin) {
+      currentlyCheckedIn = receivedCheckinInfo.checkOutTime
+          .isBefore(receivedCheckinInfo.checkInTime);
 
-    /* If checked in get the lot. Thus lotCheckedInto may never receive a value. Nick-specific TODO: This is bad practice. Fix it.*/
-    if (hasLastCheckin && currentlyCheckedIn)
-      lotCheckedInto = await Requests.getLot(
-          widget.userInfo.venueId, receivedCheckinInfo.lotId);
+      lastCheckin = receivedCheckinInfo;
+
+      /* If checked in get the lot. Thus lotCheckedInto may never receive a value. Nick-specific TODO: This is bad practice. Fix it.*/
+      if (currentlyCheckedIn)
+        lotCheckedInto = await Requests.getLot(
+            widget.userInfo.venueId, receivedCheckinInfo.lotId);
+    }
 
     setState(() {
       isBusy = false;
