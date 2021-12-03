@@ -1,16 +1,16 @@
 package api
 
 import (
-	"net/http"
 	"encoding/json"
-	"time"
 	"io"
+	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func AuthMiddleware(c *gin.Context) {
-	token, ok := c.Request.Header["authorization"]
+	token, ok := c.Request.Header["Authorization"]
 	if !ok {
 		c.IndentedJSON(http.StatusUnauthorized, "No Access Token Provided")
 		return
@@ -35,7 +35,8 @@ func AuthMiddleware(c *gin.Context) {
 	}
 
 	resp := struct {
-		exp int64
+		err   string `json:"error"`
+		exp   int64
 		email string
 	}{}
 	err = json.Unmarshal(respData, &resp)
@@ -44,10 +45,13 @@ func AuthMiddleware(c *gin.Context) {
 		return
 	}
 
-	if time.Unix(resp.exp, 0).Before(time.Now()) {
+	if resp.err != "" {
 		c.IndentedJSON(http.StatusUnauthorized, err)
 		return
 	}
 
-	// TODO: Store User in db if they are not already
+	if time.Unix(resp.exp, 0).Before(time.Now()) {
+		c.IndentedJSON(http.StatusUnauthorized, err)
+		return
+	}
 }
