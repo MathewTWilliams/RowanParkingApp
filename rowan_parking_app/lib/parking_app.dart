@@ -10,7 +10,8 @@ class ParkingApp extends StatefulWidget {
   LoginReceipt userInfo;
   final Future<void> Function() logoutAction;
 
-  ParkingApp({Key? key, required this.userInfo, required this.logoutAction}) : super(key: key);
+  ParkingApp({Key? key, required this.userInfo, required this.logoutAction})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => ParkingAppState();
@@ -20,7 +21,9 @@ class ParkingAppState extends State<ParkingApp> {
   bool isBusy = false;
   late CheckinInfo lastCheckin;
   bool currentlyCheckedIn = false;
+  bool hasLastCheckin = false;
   late Lot lotCheckedInto;
+  late CheckinInfo receivedCheckinInfo;
 
   Widget body = LotsWidget();
   Text contentTitle = const Text("Parking Lots");
@@ -32,95 +35,107 @@ class ParkingAppState extends State<ParkingApp> {
     super.initState();
   }
 
-  Future<void> loadLastCheckinInfo() async{
-    
-    CheckinInfo receivedCheckinInfo = await Requests.getCheckinInfo(widget.userInfo.lastCheckIn);
+  Future<void> loadLastCheckinInfo() async {
+    if (widget.userInfo.lastCheckIn >= 0 && lastCheckin != null) {
+      hasLastCheckin = true;
+      try {
+        receivedCheckinInfo =
+            await Requests.getCheckinInfo(widget.userInfo.lastCheckIn);
+      } catch (Exception) {
+        print("No previous checkin. whatever");
+      }
 
-
-    /* When a user hasn't checked out, the server returns a checkout DateTime of the form 0001-01-01 00:00:00.000Z.
+      /* When a user hasn't checked out, the server returns a checkout DateTime of the form 0001-01-01 00:00:00.000Z.
     Checking if checkout is before checkin should be robust enough to determine this, for now. */
-    currentlyCheckedIn = receivedCheckinInfo.checkOutTime.isBefore(receivedCheckinInfo.checkInTime);
+      if (hasLastCheckin)
+        currentlyCheckedIn = receivedCheckinInfo.checkOutTime
+            .isBefore(receivedCheckinInfo.checkInTime);
+    }
 
     /* If checked in get the lot. Thus lotCheckedInto may never receive a value. Nick-specific TODO: This is bad practice. Fix it.*/
-    if(currentlyCheckedIn)
-      lotCheckedInto = await Requests.getLot(widget.userInfo.venueId, receivedCheckinInfo.lotId);
+    if (hasLastCheckin && currentlyCheckedIn)
+      lotCheckedInto = await Requests.getLot(
+          widget.userInfo.venueId, receivedCheckinInfo.lotId);
 
     setState(() {
       isBusy = false;
-      lastCheckin = receivedCheckinInfo;
 
-      if(currentlyCheckedIn)
-         Navigator.of(context).push(
-                  MaterialPageRoute(
-                      builder: (context) => CheckoutWidget(
-                            lot: lotCheckedInto,
-                          )),
-                );
+      if (hasLastCheckin) lastCheckin = receivedCheckinInfo;
+
+      if (currentlyCheckedIn)
+        Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: (context) => CheckoutWidget(
+                    lot: lotCheckedInto,
+                  )),
+        );
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return isBusy? Scaffold( //Loading screen while gathering information
-              body: Center(
-                  child: const CircularProgressIndicator())
-    ):
-    Scaffold(
-      appBar: AppBar(
-        title: contentTitle,
-      ),
-      body: body,
-      drawer: Drawer(
-        elevation: 2,
-        child: ListView(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.local_parking_outlined),
-              title: const Text("Parking Lots"),
-              onTap: () {
-                setState(() {
-                  contentTitle = const Text("Parking Lots");
-                  body = LotsWidget();
-                  Navigator.of(context).pop();
-                });
-              },
+    return isBusy
+        ? Scaffold(
+            //Loading screen while gathering information
+            body: Center(child: const CircularProgressIndicator()))
+        : Scaffold(
+            appBar: AppBar(
+              title: contentTitle,
             ),
-            ListTile(
-              leading: const Icon(Icons.check_circle_outline),
-              title: const Text("Check In"),
-              onTap: () {
-                setState(() {
-                  contentTitle = const Text("Check In");
-                  body = CheckinWidget();
-                  Navigator.of(context).pop();
-                });
-              },
+            body: body,
+            drawer: Drawer(
+              elevation: 2,
+              child: ListView(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.local_parking_outlined),
+                    title: const Text("Parking Lots"),
+                    onTap: () {
+                      setState(() {
+                        contentTitle = const Text("Parking Lots");
+                        body = LotsWidget();
+                        Navigator.of(context).pop();
+                      });
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.check_circle_outline),
+                    title: const Text("Check In"),
+                    onTap: () {
+                      setState(() {
+                        contentTitle = const Text("Check In");
+                        body = CheckinWidget();
+                        Navigator.of(context).pop();
+                      });
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.bug_report_outlined),
+                    title: const Text("Report a Problem"),
+                    onTap: () {
+                      setState(() {
+                        contentTitle = const Text("Report a Problem");
+                        body = BugReportWidget();
+                        Navigator.of(context).pop();
+                      });
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.settings_outlined),
+                    title: const Text("Settings"),
+                    onTap: () {
+                      setState(() {
+                        contentTitle = const Text("Settings");
+                        body = SettingsWidget(
+                          logoutAction: widget.logoutAction,
+                        );
+                        Navigator.of(context).pop();
+                      });
+                    },
+                  )
+                ],
+              ),
             ),
-            ListTile(
-              leading: const Icon(Icons.bug_report_outlined),
-              title: const Text("Report a Problem"),
-              onTap: () {
-                setState(() {
-                  contentTitle = const Text("Report a Problem");
-                  body = BugReportWidget();
-                  Navigator.of(context).pop();
-                });
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings_outlined),
-              title: const Text("Settings"),
-              onTap: () {
-                setState(() {
-                  contentTitle = const Text("Settings");
-                  body = SettingsWidget(logoutAction: widget.logoutAction,);
-                  Navigator.of(context).pop();
-                });
-              },
-            )
-          ],
-        ),
-      ),
-    );
+          );
   }
 }
