@@ -20,7 +20,7 @@ class Requests {
   static Future<List<Venue>> getVenueList() async {
     final String accessToken = await secureStorage.read(key: 'access_token');
     final response = await http.get(Uri.parse('http://' + serverURL + '/api/venues'),
-        headers: {'authorization': accessToken});
+        headers: {'Authorization': accessToken});
 
     if (response.statusCode == 200) {
       return Venue.venueListFromJson(response.body);
@@ -33,7 +33,7 @@ class Requests {
     final String accessToken = await secureStorage.read(key: 'access_token');
     final response = await http.get(
         Uri.parse('http://' + serverURL + '/api/venues/$venueID'),
-        headers: {'authorization': accessToken});
+        headers: {'Authorization': accessToken});
 
     if (response.statusCode == 200) {
       return VenueInfo.venueInfoFromJson(response.body);
@@ -48,7 +48,7 @@ class Requests {
 
     final response = await http.get(
         Uri.parse('http://' + serverURL + '/api/venues/$venueID/lots'),
-        headers: {'authorization': accessToken});
+        headers: {'Authorization': accessToken});
 
     if (response.statusCode == 200) {
       return Lot.lotListFromJson(response.body);
@@ -65,7 +65,7 @@ class Requests {
     final String accessToken = await secureStorage.read(key: 'access_token');
     final response = await http.get(
         Uri.parse('http://' + serverURL + '/api/venues/$venueID/lots/$lotID'),
-        headers: {'authorization': accessToken});
+        headers: {'Authorization': accessToken});
 
     if (response.statusCode == 200) {
       return Lot.lotFromJson(response.body);
@@ -85,7 +85,7 @@ class Requests {
 
     final response = await http.post(
         Uri.parse('http://' + serverURL + '/api/venues/$venueID/lots/$lotID/check_in'),
-        headers: {'authorization': accessToken, "Content-Type": "application/json"},
+        headers: {'Authorization': accessToken, "Content-Type": "application/json"},
         body: json.encode({"UserId" : userID}));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -105,7 +105,7 @@ class Requests {
 
     final response = await http.put(
         Uri.parse('http://' + serverURL + '/api/venues/$venueID/lots/$lotID/check_out'),
-        headers: {'authorization': accessToken, "Content-Type": "application/json"},
+        headers: {'Authorization': accessToken, "Content-Type": "application/json"},
         body: json.encode({"UserId" : userID}));
 
     if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
@@ -120,7 +120,7 @@ class Requests {
     final String accessToken = await secureStorage.read(key: 'access_token');
     final response = await http.post(
         Uri.parse('http://' + serverURL + '/api/users/login'),
-        headers: {'authorization': accessToken},
+        headers: {'Authorization': accessToken},
         body: jsonEncode(<String, Object>
         {
           'UserName': username,
@@ -141,7 +141,7 @@ class Requests {
     final String accessToken = await secureStorage.read(key: 'access_token');
     final response = await http.get(
         Uri.parse('http://' + serverURL + '/api/check_ins/$checkinID'),
-        headers: {'authorization': accessToken},
+        headers: {'Authorization': accessToken},
       );
 
     if (response.statusCode == 200) {
