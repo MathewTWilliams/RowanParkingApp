@@ -135,6 +135,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Rowan Parking App',
         theme: appTheme,
         home: Scaffold(
@@ -283,6 +284,7 @@ class _MyAppState extends State<MyApp> {
   static ThemeData appTheme = ThemeData(
     appBarTheme: AppBarTheme(backgroundColor: Color(0xFFFFCC00)),
     canvasColor: Color(0xFF57150B),
+    primaryColor: Colors.grey[700],
     cardTheme: CardTheme(color: Colors.grey[700]), // Button background
     textTheme: TextTheme(
         bodyText1: TextStyle(color: Colors.white), // Nav drawer labels
@@ -290,5 +292,6 @@ class _MyAppState extends State<MyApp> {
     buttonTheme: ButtonThemeData(buttonColor: Colors.brown[700]),
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(primary: Colors.brown[700])),
+
   );
 }

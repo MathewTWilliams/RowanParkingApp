@@ -56,8 +56,6 @@ class Requests {
       throw Exception(
           'Received invalid server response trying to GET Lots with venue ID $venueID. Status Code: ' + response.statusCode.toString());
     }
-
-    
   }
 
   
@@ -81,7 +79,7 @@ class Requests {
     final int userID = (await SharedPreferences.getInstance()).getInt('user_id') ?? -1;
 
     if('user_id' == -1)
-      throw Exception('No user_id found in local storage');
+      throw Exception('Local storage malformed');
 
     final response = await http.post(
         Uri.parse('http://' + serverURL + '/api/venues/$venueID/lots/$lotID/check_in'),
@@ -101,7 +99,7 @@ class Requests {
     final int userID = (await SharedPreferences.getInstance()).getInt('user_id') ?? -1;
 
     if(userID == -1)
-      throw Exception('No user_id found in local storage');
+      throw Exception('Local storage malformed');
 
     final response = await http.put(
         Uri.parse('http://' + serverURL + '/api/venues/$venueID/lots/$lotID/check_out'),
@@ -140,9 +138,9 @@ class Requests {
   static Future<CheckinInfo> getCheckinInfo(int checkinID) async {
     final String accessToken = await secureStorage.read(key: 'access_token');
     final response = await http.get(
-        Uri.parse('http://' + serverURL + '/api/check_ins/$checkinID'),
-        headers: {'Authorization': accessToken},
-      );
+      Uri.parse('http://' + serverURL + '/api/check_ins/$checkinID'),
+      headers: {'Authorization': accessToken},
+    );
 
     if (response.statusCode == 200) {
       CheckinInfo info = CheckinInfo.checkinInfoFromJson(response.body);
@@ -153,7 +151,26 @@ class Requests {
     }
   }
 
-}
+  static Future<void> sendBugReport(String bugReport) async {
+    final String accessToken = await secureStorage.read(key: 'access_token');
+    final int userID = (await SharedPreferences.getInstance()).getInt('user_id') ?? -1;
+
+    if(userID == -1)
+      throw Exception('Local storage malformed');
+
+    final response = await http.post(
+      Uri.parse('http://' + serverURL + '/api/users/report_bug'),
+      headers: {'Authorization': accessToken},
+      body: json.encode({"UserId" : userID, "BugReport": bugReport})
+    );
+
+    if(response.statusCode != 201 && response.statusCode != 200) {
+      throw Exception(
+        'An unexpected error occurred trying to report the issue. Sorry.');
+    }
+  }
+
+} //Requests
 
 class Venue {
   Venue({
