@@ -26,7 +26,7 @@ USE RowanParkingApp;
 CREATE TABLE IF NOT EXISTS Venues (
     Id INT NOT NULL AUTO_INCREMENT,
     VenueName VARCHAR(255) NOT NULL, 
-    VenueLocation POINT, 
+    VenueLocation POINT SRID 3857, 
     Timezone VARCHAR(100) NOT NULL,
     PRIMARY KEY (Id));
 
@@ -52,8 +52,8 @@ CREATE TABLE IF NOT EXISTS Lots (
     VenueId INT NOT NULL, 
     FOREIGN KEY (VenueId) REFERENCES Venues(Id),
     SpecificRules VARCHAR(510), 
-    BoundingBox POLYGON NOT NULL, 
-    LotLocation POINT NOT NULL);
+    BoundingBox POLYGON SRID 3857, 
+    LotLocation POINT SRID 3857);
 
 
 CREATE TABLE IF NOT EXISTS Lot_Check_ins (
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS Users (
     UserName VARCHAR(255) NOT NULL, 
     VenueId INT NOT NULL, 
     FOREIGN KEY(VenueId) REFERENCES Venues(Id), 
-    LastCheckIn INT NOT NULL, 
+    LastCheckIn INT NULL, 
     FOREIGN KEY(LastCheckIn) REFERENCES Lot_Check_ins(Id));
 
 
