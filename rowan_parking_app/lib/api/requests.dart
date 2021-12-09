@@ -300,11 +300,11 @@ class BoundingBox {
     });
 
     String type;
-    List<List<List<int>>> coordinates;
+    List<List<List<num>>> coordinates;
 
     factory BoundingBox.fromJson(Map<String, dynamic> json) => BoundingBox(
         type: json["type"],
-        coordinates: List<List<List<int>>>.from(json["coordinates"].map((x) => List<List<int>>.from(x.map((x) => List<int>.from(x.map((x) => x)))))),
+        coordinates: List<List<List<num>>>.from(json["coordinates"].map((x) => List<List<num>>.from(x.map((x) => List<num>.from(x.map((x) => x)))))),
     );
 
     Map<String, dynamic> toJson() => {
@@ -320,11 +320,11 @@ class LotLocation {
     });
 
     String type;
-    List<int> coordinates;
+    List<num> coordinates;
 
     factory LotLocation.fromJson(Map<String, dynamic> json) => LotLocation(
         type: json["type"],
-        coordinates: List<int>.from(json["coordinates"].map((x) => x)),
+        coordinates: List<num>.from(json["coordinates"].map((x) => x)),
     );
 
     Map<String, dynamic> toJson() => {

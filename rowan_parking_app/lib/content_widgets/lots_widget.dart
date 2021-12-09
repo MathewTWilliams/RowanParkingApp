@@ -1,3 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'lotinfo_widget.dart';
 
 import 'package:flutter/material.dart';
@@ -9,6 +11,9 @@ void main() => runApp(const MaterialApp(home: LotsWidget()));
 
 //figure out how to grab information from the server than convert them to strings here
 
+late String shownLotType;
+late SharedPreferences prefs;
+
 class LotsWidget extends StatefulWidget {
   const LotsWidget({Key? key}) : super(key: key);
   @override
@@ -16,39 +21,54 @@ class LotsWidget extends StatefulWidget {
 }
 
 class LotsWidgetState extends State<LotsWidget> {
-  late Future<List<Lot>> futureLotEntries;
+  bool loading = true;
+  late List<Lot> lotEntries;
 
   @override
   void initState() {
-    super.initState();
+    loading = true;
 
-    futureLotEntries =
-        Requests.getLotList(1); // TODO get venueID instead of placeholder
+    initialize();
+
+    super.initState();
+  }
+
+  Future<void> initialize() async {
+
+    prefs = await SharedPreferences.getInstance();
+
+    lotEntries = await Requests.getLotList(1); // TODO get venueID instead of placeholder
+
+    shownLotType = prefs.getString("shown_lot_type_str") ?? "All";
+
+    setState(() {
+      loading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Lot>>(
-        future: futureLotEntries,
-        builder: (context, snapshot) {
-            if (snapshot.hasError){
-              return Text('${snapshot.error}');
-            }
-            return Scaffold(
-              body: Center(
-                child: Container(
-                  alignment: Alignment.center,
-                  child: !snapshot.hasData? Container(
-                    alignment: Alignment.center,
-                    child: const CircularProgressIndicator()) :
-                  ListView(
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
-                      children: <Widget>[
-                    for (Lot lotEntry in snapshot.data!)
-                      CheckinBox(lotEntry: lotEntry)
-                  ]))));
-        });
+    return Scaffold(
+      body: Center(
+        child: Container(
+          alignment: Alignment.center,
+          child: loading? Container(
+            alignment: Alignment.center,
+            child: const CircularProgressIndicator()
+          ) :
+          ListView(
+            shrinkWrap: true,
+            padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
+            children: <Widget>[
+              for (Lot lotEntry in lotEntries)
+                if(lotEntry.lotInfo.lotDescription == shownLotType + " Parking" || shownLotType == "All")
+                  CheckinBox(lotEntry: lotEntry)
+            ]
+          )
+        )
+      )
+    );
+        
   }
 }
 
