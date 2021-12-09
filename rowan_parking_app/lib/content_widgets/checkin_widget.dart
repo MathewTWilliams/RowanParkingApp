@@ -21,25 +21,23 @@ class CheckinWidget extends StatelessWidget {
           if (snapshot.hasError) {
             return Text('${snapshot.error}');
           }
-          return 
-            Scaffold(
+          return Scaffold(
               body: Center(
-                child: Container(
-                  alignment: Alignment.center,
-                  child: !snapshot.hasData ? const CircularProgressIndicator() :
-                  ListView(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
-                    children: <Widget>[
-                      for (Lot lotEntry in snapshot.data!)
-                        CheckinBox(
-                          lot: lotEntry,
-                        )
-                    ],
-                  )
-                )
-            )
-          );
+                  child: Container(
+                      alignment: Alignment.center,
+                      child: !snapshot.hasData
+                          ? const CircularProgressIndicator()
+                          : ListView(
+                              shrinkWrap: true,
+                              padding: const EdgeInsets.fromLTRB(
+                                  10.0, 20.0, 10.0, 20.0),
+                              children: <Widget>[
+                                for (Lot lotEntry in snapshot.data!)
+                                  CheckinBox(
+                                    lot: lotEntry,
+                                  )
+                              ],
+                            ))));
         });
   }
 }

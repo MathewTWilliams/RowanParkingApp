@@ -85,14 +85,17 @@ class Login extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        Text(
-          'Welcome To the Rowan Parking App',
-          textAlign: TextAlign.left,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
+        Center(
+          child: Text(
+            'Welcome To the Rowan Parking App',
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.clip,
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 25,
-              color: Color(0xFFFFCC00)),
+              color: Color(0xFFFFCC00)
+            ),
+          ),
         ),
         RaisedButton(
           onPressed: () async {
