@@ -283,6 +283,7 @@ class _MyAppState extends State<MyApp> {
 
   static ThemeData appTheme = ThemeData(
     appBarTheme: AppBarTheme(backgroundColor: Color(0xFFFFCC00)),
+    iconTheme: IconThemeData(color: Colors.white),
     canvasColor: Color(0xFF57150B),
     primaryColor: Colors.grey[700],
     cardTheme: CardTheme(color: Colors.grey[700]), // Button background

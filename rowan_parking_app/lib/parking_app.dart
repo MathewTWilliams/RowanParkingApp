@@ -36,14 +36,21 @@ class ParkingAppState extends State<ParkingApp> {
   }
 
   Future<void> loadLastCheckinInfo() async {
-    receivedCheckinInfo =
-        await Requests.getCheckinInfo(widget.userInfo.lastCheckIn);
-
     hasLastCheckin = widget.userInfo.lastCheckIn != -1;
+
+    if(!hasLastCheckin) {
+      setState(() {isBusy = false;});
+      return;
+    }
 
     /* When a user hasn't checked out, the server returns a checkout DateTime of the form 0001-01-01 00:00:00.000Z.
     Checking if checkout is before checkin should be robust enough to determine this, for now. */
     if (hasLastCheckin) {
+
+      receivedCheckinInfo =
+        await Requests.getCheckinInfo(widget.userInfo.lastCheckIn);
+
+
       currentlyCheckedIn = receivedCheckinInfo.checkOutTime
           .isBefore(receivedCheckinInfo.checkInTime);
 
@@ -86,7 +93,7 @@ class ParkingAppState extends State<ParkingApp> {
               child: ListView(
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.local_parking_outlined),
+                    leading: const Icon(Icons.local_parking_outlined, color: Colors.white),
                     title: const Text("Parking Lots"),
                     onTap: () {
                       setState(() {
@@ -97,7 +104,7 @@ class ParkingAppState extends State<ParkingApp> {
                     },
                   ),
                   ListTile(
-                    leading: const Icon(Icons.check_circle_outline),
+                    leading: const Icon(Icons.check_circle_outline, color: Colors.white),
                     title: const Text("Check In"),
                     onTap: () {
                       setState(() {
@@ -108,7 +115,7 @@ class ParkingAppState extends State<ParkingApp> {
                     },
                   ),
                   ListTile(
-                    leading: const Icon(Icons.bug_report_outlined),
+                    leading: const Icon(Icons.bug_report_outlined, color: Colors.white),
                     title: const Text("Report a Problem"),
                     onTap: () {
                       setState(() {
@@ -119,7 +126,7 @@ class ParkingAppState extends State<ParkingApp> {
                     },
                   ),
                   ListTile(
-                    leading: const Icon(Icons.settings_outlined),
+                    leading: const Icon(Icons.settings_outlined, color: Colors.white),
                     title: const Text("Settings"),
                     onTap: () {
                       setState(() {
