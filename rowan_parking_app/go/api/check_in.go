@@ -82,6 +82,18 @@ func (api *API) PostCheckIn(c *gin.Context) {
 	checkInResponse.CheckInInfo.CheckInTime = checkInTime
 	checkInResponse.CheckInInfo.UserId = payload.UserId
 
+	//check to see if user is logged into another lot.
+	conds = []string{"Where UserId = " + strconv.FormatInt(payload.UserId, 10),
+		"And CheckOutTime is Null"}
+	id_check := api.ds.CheckIfExists(constants.TABLENAME_LCI, conds)
+	if id_check != -1 {
+		_, err = api.ds.InsertCheckOut(checkInTime, strconv.FormatInt(payload.UserId, 10), l_id)
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, err.Error())
+			return
+		}
+	}
+
 	checkin_id, err := api.ds.InsertCheckIn(checkInResponse.CheckInInfo)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
