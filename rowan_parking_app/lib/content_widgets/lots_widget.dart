@@ -1,3 +1,4 @@
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'lotinfo_widget.dart';
@@ -14,6 +15,16 @@ void main() => runApp(const MaterialApp(home: LotsWidget()));
 late String shownLotType;
 late SharedPreferences prefs;
 
+late GoogleMapController mapController;
+
+late List<Lot> lotEntries;
+
+  final LatLng _center = const LatLng(39.712895, -75.119441);
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
+
 class LotsWidget extends StatefulWidget {
   const LotsWidget({Key? key}) : super(key: key);
   @override
@@ -22,7 +33,6 @@ class LotsWidget extends StatefulWidget {
 
 class LotsWidgetState extends State<LotsWidget> {
   bool loading = true;
-  late List<Lot> lotEntries;
 
   @override
   void initState() {
@@ -49,14 +59,21 @@ class LotsWidgetState extends State<LotsWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: /*Center(
         child: Container(
           alignment: Alignment.center,
           child: loading? Container(
             alignment: Alignment.center,
             child: const CircularProgressIndicator()
-          ) :
-          ListView(
+          ) :*/
+          GoogleMap(
+          onMapCreated: _onMapCreated,
+          initialCameraPosition: CameraPosition(
+            target: _center,
+            zoom: 50.0,
+            ),
+          ),
+          /*ListView(
             shrinkWrap: true,
             padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
             children: <Widget>[
@@ -64,9 +81,8 @@ class LotsWidgetState extends State<LotsWidget> {
                 if(lotEntry.lotInfo.lotDescription == shownLotType + " Parking" || shownLotType == "All")
                   CheckinBox(lotEntry: lotEntry)
             ]
-          )
-        )
-      )
+          )*/
+        
     );
         
   }
