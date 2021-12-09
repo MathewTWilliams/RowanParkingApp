@@ -46,10 +46,16 @@ class LotsWidgetState extends State<LotsWidget> {
   Future<void> initialize() async {
 
     prefs = await SharedPreferences.getInstance();
-
-    lotEntries = await Requests.getLotList(1); // TODO get venueID instead of placeholder
+    
+    List<Lot> receivedLots = await Requests.getLotList(1); // TODO get venueID instead of placeholder
 
     shownLotType = prefs.getString("shown_lot_type_str") ?? "All";
+
+    lotEntries = [];
+    for (Lot lot in receivedLots) {
+      if(lot.lotInfo.lotDescription == shownLotType + " Parking" || shownLotType == "All")
+        lotEntries.add(lot);
+    }
 
     setState(() {
       loading = false;
@@ -59,30 +65,19 @@ class LotsWidgetState extends State<LotsWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: /*Center(
+      body: loading? Center(
         child: Container(
-          alignment: Alignment.center,
-          child: loading? Container(
             alignment: Alignment.center,
             child: const CircularProgressIndicator()
-          ) :*/
-          GoogleMap(
-          onMapCreated: _onMapCreated,
-          initialCameraPosition: CameraPosition(
-            target: _center,
-            zoom: 50.0,
-            ),
+          )
+        ) :
+        GoogleMap(
+        onMapCreated: _onMapCreated,
+        initialCameraPosition: CameraPosition(
+          target: _center,
+          zoom: 15.6,
           ),
-          /*ListView(
-            shrinkWrap: true,
-            padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
-            children: <Widget>[
-              for (Lot lotEntry in lotEntries)
-                if(lotEntry.lotInfo.lotDescription == shownLotType + " Parking" || shownLotType == "All")
-                  CheckinBox(lotEntry: lotEntry)
-            ]
-          )*/
-        
+        ),
     );
         
   }
@@ -130,34 +125,3 @@ class CheckinBox extends StatelessWidget {
     );
   }
 }
-
-
-/* Code removed from the original, it originally replaced the Scaffold() in the build Widget
-return FutureBuilder<Lots>(
-  future: futureLots,
-  builder: (context, snapshot) {
-    if (snapshot.hasData) {
-    return Text(snapshot.data!.SpotsTaken.toString());
-      } else {
-        return Text('${snapshot.error}');
-     }
-   },
- );
- //As above but just under the CheckinBox(), in the Scaffold portion of the app
-             Column(
-              children: <Widget>[
-                Center(
-                  child: FutureBuilder<Lots>(
-                    future: futureLots,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return Text(snapshot.data!.spotsTaken.toString());
-                      } else {
-                        return Text('${snapshot.error}');
-                      }
-                    },
-                  ),
-                )
-                ],
-            ),
-*/
