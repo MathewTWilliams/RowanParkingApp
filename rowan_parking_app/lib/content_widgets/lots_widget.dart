@@ -1,4 +1,5 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:rowan_parking_app/content_widgets/extra_info_popup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'lotinfo_widget.dart';
@@ -12,7 +13,6 @@ void main() => runApp(const MaterialApp(home: LotsWidget()));
 
 //figure out how to grab information from the server than convert them to strings here
 
-late String shownLotType;
 late SharedPreferences prefs;
 
 late GoogleMapController mapController;
@@ -49,11 +49,11 @@ class LotsWidgetState extends State<LotsWidget> {
     
     List<Lot> receivedLots = await Requests.getLotList(1); // TODO get venueID instead of placeholder
 
-    shownLotType = prefs.getString("shown_lot_type_str") ?? "All";
+    String shownLotType = prefs.getString("shown_lot_type_str") ?? "All";
 
     lotEntries = [];
     for (Lot lot in receivedLots) {
-      if(lot.lotInfo.lotDescription == shownLotType + " Parking" || shownLotType == "All")
+      if(lot.lotInfo.lotDescription.toLowerCase().contains(shownLotType.toLowerCase()) || shownLotType == "All")
         lotEntries.add(lot);
     }
 
@@ -73,13 +73,32 @@ class LotsWidgetState extends State<LotsWidget> {
         ) :
         GoogleMap(
         onMapCreated: _onMapCreated,
-        markers: {_kGooglePlexMarker,_kGooglePlexMarkerr,_kGooglePlexMarker2,_kGooglePlexMarker3,_kGooglePlexMarker4,_kGooglePlexMarker5,
+
+        markers: {
+          for(Lot lot in lotEntries)
+            //Ignore the blue squigglies. They are lying to you and this sanity check is necessary.
+            if(lot.lotInfo.lotLocation.coordinates != null && lot.lotInfo.lotLocation.coordinates.length >= 2)
+              Marker(
+                markerId: MarkerId("lot${lot.lotInfo.id}"),
+                infoWindow: InfoWindow(title: lot.lotInfo.lotName),
+                icon: BitmapDescriptor.defaultMarker,
+                position: LatLng(lot.lotInfo.lotLocation.coordinates[1] as double, lot.lotInfo.lotLocation.coordinates[0] as double),
+                consumeTapEvents: true,
+                onTap: () {
+                  showDialog(
+                    context: context, 
+                    builder: (context) => ExtraInfoPopup(lot),
+                    barrierColor: Colors.white10
+                  );
+                },
+              )
+          /*_kGooglePlexMarker,_kGooglePlexMarkerr,_kGooglePlexMarker2,_kGooglePlexMarker3,_kGooglePlexMarker4,_kGooglePlexMarker5,
             _kGooglePlexMarker6,_kGooglePlexMarker7,_kGooglePlexMarker8,_kGooglePlexMarker9,_kGooglePlexMarker10,_kGooglePlexMarker11,
             _kGooglePlexMarker12,_kGooglePlexMarker13,_kGooglePlexMarker14,_kGooglePlexMarker15, _kGooglePlexMarker16, _kGooglePlexMarker17,
             _kGooglePlexMarker18, _kGooglePlexMarker19, _kGooglePlexMarker20,_kGooglePlexMarker21,_kGooglePlexMarker22,_kGooglePlexMarker23,
             _kGooglePlexMarker24,_kGooglePlexMarker25,_kGooglePlexMarker26,_kGooglePlexMarker27,_kGooglePlexMarker28,_kGooglePlexMarker29,
             _kGooglePlexMarker30,_kGooglePlexMarker31,_kGooglePlexMarker32,_kGooglePlexMarker33,_kGooglePlexMarker34,_kGooglePlexMarker35,
-            _kGooglePlexMarker36, _kGooglePlexMarker37, _kGooglePlexMarker38,},
+            _kGooglePlexMarker36, _kGooglePlexMarker37, _kGooglePlexMarker38,*/},
         initialCameraPosition: CameraPosition(
           target: _center,
           zoom: 15.6,
