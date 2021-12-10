@@ -125,7 +125,7 @@ class Requests {
           'VenueId': venueID
         }));
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       LoginReceipt rec = LoginReceipt.userDetailsFromJson(response.body);
       print("Login processed. Last checkin's id is ${rec.lastCheckIn}");
       return rec;

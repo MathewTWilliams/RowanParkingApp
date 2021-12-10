@@ -110,7 +110,7 @@ class SettingsWidgetState extends State<SettingsWidget> {
               title: 'Lots Shown',
               subtitle: selectedShownLotTypeValue,
               subtitleTextStyle: TextStyle(color: Theme.of(context).textTheme.bodyText1?.color),
-              leading: Icon(Icons.language, color: Theme.of(context).textTheme.bodyText1?.color),
+              leading: Icon(Icons.local_parking_outlined, color: Theme.of(context).textTheme.bodyText1?.color),
               trailing: Icon(Icons.keyboard_arrow_right, color: Theme.of(context).textTheme.bodyText1?.color),
               onPressed: (BuildContext context) {
                 Navigator.of(context).push(
@@ -134,6 +134,7 @@ class SettingsWidgetState extends State<SettingsWidget> {
           //titleTextStyle: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Theme.of(context).appBarTheme.backgroundColor),
           //title: 'Misc',
           tiles: [
+              /*
               SettingsTile(
                 title: 'Text Size' ,
                 titleTextStyle: TextStyle(color: Theme.of(context).textTheme.bodyText1?.color),
@@ -143,6 +144,7 @@ class SettingsWidgetState extends State<SettingsWidget> {
                 trailing: Icon(Icons.keyboard_arrow_right, color: Theme.of(context).textTheme.bodyText1?.color),
                 onPressed: (BuildContext context) {},
               ),
+              */
               SettingsTile(
                 title: 'Logout of app' ,
                 titleTextStyle: TextStyle(color: Theme.of(context).textTheme.bodyText1?.color),
